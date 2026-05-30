@@ -221,13 +221,66 @@ DEBUG="true"
 | `backup-workspace.sh` | ~/.openclaw/workspace/tools/ | 工作空间备份 |
 | `searxng-search.py` | ~/.openclaw/workspace/tools/ | SearXNG CLI（备用）|
 
-## Memory Topics
+## VCPToolBox & VCPChat
 
-| 文件 | 内容 |
-|------|------|
-| `memory/topics/01-config.md` | 系统配置 |
-| `memory/topics/02-tools.md` | 工具说明 |
-| `memory/topics/03-knowledge-essence.md` | 知识精华（AgentMemory/Skill/ModelRouter/EventTracker）|
+### VCPToolBox（开源 AI 代理中间层）
+- **仓库**: https://github.com/lioensky/VCPToolBox
+- **技术栈**: Node.js + Express + WebSocket
+- **定位**: 多 Agent 协作中间件，插件化设计
+- **本地路径**: ~/VCPToolBox/
+- **安装状态**: ⚠️ npm install 完成（608 packages），但 server.js 启动还缺 native Rust 模块 vexus-lite
+  - 核心问题：KnowledgeBaseManager.js 依赖 rust-vexus-lite（Rust 向量索引）
+  - 解决方向：自启动 cron 会持续尝试补全缺失模块直到启动成功
+  - config.env 已创建，配置 Ollama API (http://127.0.0.1:11434/v1)
+
+#### 核心架构
+- **TagMemoEngine**: 多级持久化记忆系统
+  - 全局 / Agent / 会话 / 消息四级 context
+  - 向量检索（RAG）+ 标签记忆
+  - 基于 hnswlib-node（层次可导航小世界图）
+- **Plugin**: 插件生命周期管理（加载/卸载/启用禁用）
+  - 内置: SearchPlugin, CalculatorPlugin, ImageGenPlugin
+- **Agent**: 单个 Agent 实例管理
+- **Router**: 语义路由（基于配置规则的 AI 模型选择）
+- **ToolManager**: 工具注册与调用
+- **WorkerPool**: 多模型并发请求池
+
+#### 对话协议
+- 支持 SillyTavern、WebOpenUI 客户端
+- WebSocket + REST 双接口
+- 上下文自动注入（memory + global config）
+
+#### 关键文件
+- `server.js` - 入口，Express + WebSocket 服务器
+- `TagMemoEngine.js` - 记忆引擎核心
+- `Plugin.js` - 插件系统
+- `EmbeddingUtils.js` - 向量嵌入工具（ollama / openai / dashscope）
+- `SemanticModelRouter.json` - 模型路由规则
+
+#### 量化交易结合点
+- **RAG 检索**: 策略文档 + 市场数据 → 实时上下文
+- **多模型路由**: 不同任务用不同模型（如 sentiment → 7B, prediction → 14B）
+- **Plugin 扩展**: 自定义行情搜索 Plugin
+
+### VCPChat（Electron 桌面客户端）
+- **仓库**: https://github.com/lioensky/VCPChat
+- **技术栈**: Electron + Rust 音频引擎
+- **功能**: 语音对话 + 桌面 Agent 操控
+- **注意**: 需要 Windows/macOS，Linux 不支持
+
+## 自我驱动 Cron
+- 每 5 分钟自动检查：VCPToolBox 启动、Ollama 健康、Git 备份、agent-symphony sync
+- Cron ID: `5d7486d7-f7dd-4c9f-996b-f7bdebfd7d57`
+
+## Hermes 集成状态
+- Hermes 已安装 (v0.15.1, `~/.hermes/`)
+- AgentTeam 已安装 (v0.7.6)
+- Gateway token 已写入 `~/.hermes/.env`
+- `OPENCLAW_GATEWAY_PORT=18789`
+- `agentteam inbox` CLI 就绪
+- 共享 workspace 记忆（`~/.openclaw/workspace/memory/`）
+
+## Memory Topics
 
 ---
 

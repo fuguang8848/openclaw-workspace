@@ -1,0 +1,17 @@
+{
+  "phase": "done",
+  "answers": {
+    "goal": "我想优化我的工作流程",
+    "constraints": "主要是减少重复操作",
+    "context": "日常任务多",
+    "success": "效率提升50%",
+    "priority": "自动化程度"
+  },
+  "questions": [
+    "goal",
+    "constraints",
+    "context",
+    "success",
+    "priority"
+  ]
+}
