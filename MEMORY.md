@@ -131,7 +131,7 @@ DEBUG="true"
 
 - **agent 用户**: sudo 免密，密码 20051101
   - 使用方式: `sudo -u agent <命令>`
-- **GitHub PAT**: `ghp_***REDACTED***`
+- **GitHub PAT**: `ghp_***REDACTED-via-filter-branch***`
   - 权限: All repositories (full control)
   - 用途: `gh` CLI 全自动操作 GitHub 仓库
   - **保密**: 仅本人使用，不要外泄
