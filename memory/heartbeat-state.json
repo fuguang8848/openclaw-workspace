@@ -1,0 +1,15 @@
+{
+  "lastDayCheck": "2026-05-29T09:23:00+08:00",
+  "lastWeekCheck": "2026-05-18T09:00:00+08:00",
+  "lastErrorCount": 0,
+  "lastChecks": {
+    "email": 1745669640,
+    "dream": 1745669580,
+    "brief": 1747735680,
+    "heartbeat": 1748576580
+  },
+  "notes": {
+    "system": "Disk 82G/466G (19%), no GPU, no memory stats (permission denied)",
+    "heartbeat_stale": "State was from 2026-04-26, updated 2026-05-29"
+  }
+}
