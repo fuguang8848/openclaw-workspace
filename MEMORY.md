@@ -131,7 +131,7 @@ DEBUG="true"
 
 - **agent 用户**: sudo 免密，密码 20051101
   - 使用方式: `sudo -u agent <命令>`
-- **GitHub PAT**: `ghp_***REDACTED-via-filter-branch***`
+- **GitHub PAT**: `ghp_ei…r7jz` *(完整 token 仅在本地 `~/.openclaw/.secrets/github.pat` 备份，MEMORY 不存明文)*
   - 权限: All repositories (full control)
   - 用途: `gh` CLI 全自动操作 GitHub 仓库
   - **保密**: 仅本人使用，不要外泄
@@ -364,7 +364,25 @@ path = snapshot_download(
 ### Ollama registry 已知问题
 
 - `deepseek-v4-flash` manifest 已不存在（下市），无法 pull
-- 替代方案：Qwen2.5-72B Q4_K_M（~47GB，128GB 可跑）或 Qwen2.5-7B Q4_K_M（~4.7GB）
+- 替代方案：DeepSeek R1-Distill 系列（推荐）或 Qwen2.5-7B Q4_K_M（~4.7GB）
+
+### 已验证可用的本地模型
+
+| 模型 | 大小 | 量化 | 状态 | 备注 |
+|------|------|------|------|------|
+| qwen2.5-7b-q4 | ~4.7GB | Q4_K_M | ✅ 可用 | ModelScope下载，Ollama导入，CPU推理~4.6s/token |
+| llama3.2:1b | ~1.3GB | - | ✅ 可用 | Ollama官方registry拉取 |
+| deepseek-r1:14b | ~9GB | Q4_K_M | 待拉取 | 推理能力强，推荐 |
+| deepseek-r1:7b | ~4.7GB | Q4_K_M | 待拉取 | 最轻量R1 |
+
+### DeepSeek R1-Distill 系列（推理能力强）
+
+- R1-Distill-Qwen-7B: 4.7GB Q4，最轻量
+- R1-Distill-Qwen-14B: 9GB Q4，推荐
+- R1-Distill-Llama-14B: 9GB Q4，推荐
+- R1-Distill-Llama-70B: ~70GB Q4，128GB可跑但慢
+
+拉取命令：`curl -X POST http://127.0.0.1:11434/api/pull -d '{"name":"deepseek-r1:14b"}'`
 
 ### 大模型部署目标
 
@@ -387,5 +405,153 @@ path = snapshot_download(
 - 优先级较高，如果空闲应该第一个关注此事
 - 应该单独设立清晰的工作文件夹给这个项目，确保记忆不错乱，这是一个长期项目，要注重好文档质量
 - agent交响乐技能家族的思路是分支的技能组合起来就是一个工作流（agentsymphony），而分开又独立能作为强大的该领域的技能来使用，所以要做好这一点。
-- 四个技能在github上的仓库：https://github.com/YintaTriss/AgentSearch；https://github.com/YintaTriss/AgentTeam；https://github.com/YintaTriss/Agent-superthinking；https://github.com/YintaTriss/AgentSymphony；https://github.com/YintaTriss/AgentMemory
+- 五个仓库在github：AgentSearch、AgentTeam、Agent-superthinking、AgentSymphony、AgentMemory（均为 YintaTriss/fuguang8848）
+- **2026-06-01 同步状态**：AgentSymphony ✅、AgentTeam ✅、AgentSearch ✅ 已与上游同步；Agent-superthinking 和 AgentMemory 各有 1 个本地 commit 已推送并提 PR（PR#2）
 
+
+---
+
+## 2026-05-31 凌晨补充
+
+### DeepSeek R1-Distill-Llama-70B 已下载 ✅
+- 路径: `~/.cache/modelscope/hub/models/deepseek-ai/DeepSeek-R1-Distill-Llama-70B/`
+- 132GB BF16 safetensors（17分片）
+- 下一步: llama.cpp 转换 + Q4_K_M 量化 → import Ollama
+
+### VCPToolBox 实际状态（2026-05-30）
+- 服务跑在 6005 端口 ✅
+- routes/chat.js 缺失（GitHub 404）⚠️
+- config.env 已配置 Ollama API
+- 启动: cd ~/VCPToolBox && node server.js
+
+### Hermes
+- Dashboard: `hermes dashboard`（端口 9119）
+- agentteam inbox CLI 就绪
+
+### Watt Toolkit
+- 路径: `/home/fuguang/WattToolkit/Steam++.sh`
+- bash /home/fuguang/WattToolkit/Steam++.sh &
+
+### 关键教训
+- npm registry 极慢但最终能通（79秒/包）
+- gateway 重启 kill exec，长任务用 sessions_spawn
+- workspace 备份被分支保护阻止
+
+---
+
+## NLLB-200 东乡语翻译训练项目
+
+### 项目背景
+- **目标**：用亲缘语言迁移（蒙古语→东乡语）训练 NLLB-200 模型
+- **技术路线**：蒙古语（khk_Cyrl）作为源语言代理，蒙古语族亲缘关系做迁移
+- **资料包来源**：楚灵整理，`~/下载/石榴籽项目NLLB训练资料包.zip`
+
+### 项目工作区
+- **路径**: `~/nllb-project/`
+- **语料**: 
+  - 蒙古语: `data/train_mongolian.jsonl`（105万条）✅
+  - 东乡语: `data/train_train_dongxiang.jsonl`（9311条）+ `val_train_dongxiang.jsonl`（1034条）✅
+- **脚本**: `scripts/`
+  - `preprocess_mongolian.py` — 蒙古语语料预处理 ✅
+  - `preprocess_dongxiang.py` — 东乡语语料预处理 ✅
+  - `train_stage1_mongolian.py` — 第一阶段：蒙古语预训练
+  - `train_stage2_dongxiang.py` — 第二阶段：东乡语微调
+  - `evaluate.py` — 评估脚本
+
+### NLLB 模型
+- **模型**: facebook/nllb-200-distilled-600M（615M参数）
+- **缓存路径**: `~/.cache/huggingface/hub/models--facebook--nllb-200-distilled-600M/snapshots/f8d333a098d19b4fd9a8b18f94170487ad3f821d/`
+- **状态**: ✅ 已下载（约 2.3GB）
+
+### PyTorch ROCm 环境
+- **torch**: `2.5.1+rocm6.2` ✅ GPU 驱动正常
+- **GPU**: AMD Radeon 8060S（gfx1151），128GB 统一内存
+- **ROCm**: 6.2.2（系统默认）+ 7.2.4（已安装）
+- **关键环境变量**: 
+  ```
+  LD_LIBRARY_PATH=/opt/rocm-6.2.2/lib:/opt/rocm-6.2.2/lib/llvm/lib:$LD_LIBRARY_PATH
+  HSA_OVERRIDE_GFX_VERSION=11.5.1
+  ```
+- **验证命令**: `LD_LIBRARY_PATH=/opt/rocm-6.2.2/lib:/opt/rocm-6.2.2/lib/llvm/lib:$LD_LIBRARY_PATH HSA_OVERRIDE_GFX_VERSION=11.5.1 python3 -c "import torch; print(torch.cuda.is_available())"`
+
+### ⚠️ 待解决
+- **GPU 推理 segfault**: `model.generate()` 在 GPU 上 segfault，需进一步调试 ROCm 版本兼容性
+- **训练尚未开始**: 预处理完成，GPU 环境就绪但推理 segfault 待修复
+
+### 踩坑记录摘要（详见资料包 docs/踩坑记录.md）
+- ❌ 不用 `eng_Latn`（土耳其语代理，不是英文）
+- ❌ 不用 `add_tokens()`（不重建 SentencePiece，新增字符仍被拆分）
+- ❌ NumPy 必须 < 2.0（2.x 与 PyTorch 2.1 不兼容）
+- ❌ HF_ENDPOINT 必须在 Python 启动前 export
+
+### 下载协作规则（2026-06-01 确立）
+- **大型下载都让浮光来下**：本机下载不稳定（代理延迟、githHub 不通、各种问题）
+- **V 不自己抢着下**：除非是小文件或快速测试，否则直接问浮光
+- **完整 PyTorch v2.5.1 源码（含 submodule）**：`~/下载/pytorch-v2.5.1.tar.gz`（286MB，92956 文件）由浮光下
+- **之前问题回顾**：
+  - `git clone --recurse-submodules` 在 ghproxy 下会卡死（71 个 submodule 一个一个拉）
+  - 代理 `ghproxy.cxkpro.top` 不支持 codeload 下载 tarball（返回 HTML）
+  - ghproxy.net 速度慢且不稳定
+  - 解决办法：让浮光下，V 负责解压、编译、验证
+
+---
+
+## 🌱 V 春季大扫除（2026-06-03）
+
+**触发**：浮光"启动超级大脑，全面思考改进点"。V 主动做 3 件事 + 写 1 篇 V journal。
+
+### 主动改进
+
+1. **workspace 卫生**：17 个 ROCm `.deb` 挪到 `~/下载/roc-debs/`（腾出 2.5GB）；bench 脚本归档 `tools/bench/`；vm.png 删；install_helper.py → `archive/`；3 个 `/tmp` 临时 bench 脚本 → `archive/`
+2. **Watt 启动/状态脚本**：
+   - `tools/watt-start.sh`（2.0KB）—— 一键 GUI 启，自动找 `/run/user/1000/.mutter-Xwaylandauth.*` XAUTHORITY（GNOME Wayland X11 兼容坑）
+   - `tools/watt-status.sh`（1.3KB）—— 4 态机：`DOWN(1) / ZOMBIE(2) / BOOTING(3) / OK(0)`
+   - 关键：Watt 走 Avalonia X11，必须给 XAUTHORITY（仅 `DISPLAY=:0` 抛 `XOpenDisplay failed`）
+3. **V journal 目录**：`docs/v-journal/` 建立，首篇 `2026-06-03-spring-cleanup.md` 推到 `fuguang8848/Agent-superthinking`（YintaTriss 上游 403，浮光 fork 路径）
+
+### Watt 状态机（重要）
+
+| 状态 | 退出码 | 含义 | 处理 |
+|------|------|------|------|
+| OK | 0 | 进程在 + Kestrel listening + 代理端口监听 | 无需操作 |
+| BOOTING | 3 | 进程在 + Kestrel 还没 ready | 等几秒 |
+| ZOMBIE | 2 | 进程在 + Kestrel listening + 代理端口未开 | GUI 启"启用代理" |
+| DOWN | 1 | Watt 进程不在 | 跑 `watt-start.sh` |
+
+**Watt MinimizeOnStartup=true（默认）**—— 启后窗口最小化到托盘，看不到不一定是没启。**用 `watt-status.sh` 判断真状态**。
+
+### 写工具踩坑（必看）
+
+- ❌ **不要 `pkill -f "Steam++"`** —— 会匹配到自己的 exec 命令行自杀
+- ✅ 用精准 pid 杀：`pgrep -u $USER -f "Steam++.sh|assemblies/Steam" | xargs kill -9`
+- ✅ Watt 启动要 `setsid`/`nohup` + 完整 env（DISPLAY/XAUTHORITY/WAYLAND_DISPLAY/XDG_RUNTIME_DIR/DBUS_SESSION_BUS_ADDRESS）
+
+### 系统性问题（短期不动，记账）
+
+1. **MEMORY.md 缺章节**（已 19K 字符）—— 触发：>50K
+2. **工具链 4+4+2 重叠** —— 触发：连续 7 天没用的删
+3. **决策日志缺失** —— 触发：复盘错误决策时
+4. **踩坑 wiki 缺失** —— 触发：下次踩坑时
+5. **元认知缺位** —— 触发：event-tracker 跑 1 个月后回看
+
+### V journal GitHub 发布
+
+- **仓**：`fuguang8848/Agent-superthinking/docs/v-journal/`（YintaTriss 上游无写权限，PR 浮光自决）
+- **首篇**：`2026-06-03-spring-cleanup.md`（9092 字节，commit `ef326bf`）
+- **下次月度**：2026-07-03
+
+### 自我驱动 cron 5d7486d7 根治（19:49 修）
+
+- model: minimax/M3 → **M2.7**（M3 有 0 tool_use 假装在跑问题）
+- 频率: 5min → **15min**（减 minimax API cooldown 撞车）
+- failure-alert: 连续 3 次 error → webchat 推送，cooldown 1h
+- 验证：19:47 manual ok + 19:49 scheduled ok（12.9s 健康）
+- consecutiveErrors: 5 → 0
+
+### 长期挂账（V 端解决不了，等浮光）
+
+- NLLB torch 重装（GPU 驱动）
+- blogwatcher 安装（Go proxy 阻塞）
+- DeepSeek R1 70B Q4 量化 + Ollama 导入（已 benchmark，5 配置数据齐）
+- VCPToolBox 实际部署（缺 routes/chat.js）
+- Watt GUI 启用 26561（要浮光手动点）

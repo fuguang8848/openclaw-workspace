@@ -1,0 +1,87 @@
+=== test 1 config only 启动 2026年 06月 03日 星期三 18:45:25 CST ===
+ggml_cuda_init: found 1 ROCm devices (Total VRAM: 62207 MiB):
+  Device 0: Radeon 8060S Graphics, gfx1151 (0x1151), VMM: no, Wave Size: 32, VRAM: 62207 MiB
+load_backend: loaded ROCm backend from /home/fuguang/bin/llama.cpp-b9442/libggml-hip.so
+load_backend: loaded RPC backend from /home/fuguang/bin/llama.cpp-b9442/libggml-rpc.so
+load_backend: loaded CPU backend from /home/fuguang/bin/llama.cpp-b9442/libggml-cpu-zen4.so
+llama-bench: benchmark 1/2: starting
+llama-bench: benchmark 1/2: warmup prompt run
+llama-bench: benchmark 1/2: prompt run 1/1
+| model                          |       size |     params | backend    | ngl | n_ubatch |            test |                  t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | --: | -------: | --------------: | -------------------: |
+| llama 70B Q4_K - Medium        |  39.59 GiB |    70.55 B | ROCm       |  99 |        8 |            pp64 |         12.42 ± 0.00 |
+llama-bench: benchmark 2/2: starting
+llama-bench: benchmark 2/2: warmup generation run
+llama-bench: benchmark 2/2: generation run 1/1
+| llama 70B Q4_K - Medium        |  39.59 GiB |    70.55 B | ROCm       |  99 |        8 |            tg64 |          4.53 ± 0.00 |
+
+build: d4c8e2c29 (9442)
+=== exit=0 2026年 06月 03日 星期三 18:45:53 CST ===
+
+=== 4 configs 串行 启动 2026年 06月 03日 星期三 18:47:27 CST ===
+
+========== TEST 2: -ngl 99 -ub 16 ==========
+Start: 18:47:27
+ggml_cuda_init: found 1 ROCm devices (Total VRAM: 62207 MiB):
+  Device 0: Radeon 8060S Graphics, gfx1151 (0x1151), VMM: no, Wave Size: 32, VRAM: 62207 MiB
+load_backend: loaded ROCm backend from /home/fuguang/bin/llama.cpp-b9442/libggml-hip.so
+load_backend: loaded RPC backend from /home/fuguang/bin/llama.cpp-b9442/libggml-rpc.so
+load_backend: loaded CPU backend from /home/fuguang/bin/llama.cpp-b9442/libggml-cpu-zen4.so
+| model                          |       size |     params | backend    | ngl | n_ubatch |            test |                  t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | --: | -------: | --------------: | -------------------: |
+| llama 70B Q4_K - Medium        |  39.59 GiB |    70.55 B | ROCm       |  99 |       16 |            pp64 |         39.26 ± 0.59 |
+| llama 70B Q4_K - Medium        |  39.59 GiB |    70.55 B | ROCm       |  99 |       16 |            tg64 |          4.59 ± 0.01 |
+
+build: d4c8e2c29 (9442)
+End:   18:48:50
+----
+
+========== TEST 3: -ngl 99 -ub 32 ==========
+Start: 18:48:50
+ggml_cuda_init: found 1 ROCm devices (Total VRAM: 62207 MiB):
+  Device 0: Radeon 8060S Graphics, gfx1151 (0x1151), VMM: no, Wave Size: 32, VRAM: 62207 MiB
+load_backend: loaded ROCm backend from /home/fuguang/bin/llama.cpp-b9442/libggml-hip.so
+load_backend: loaded RPC backend from /home/fuguang/bin/llama.cpp-b9442/libggml-rpc.so
+load_backend: loaded CPU backend from /home/fuguang/bin/llama.cpp-b9442/libggml-cpu-zen4.so
+| model                          |       size |     params | backend    | ngl | n_ubatch |            test |                  t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | --: | -------: | --------------: | -------------------: |
+| llama 70B Q4_K - Medium        |  39.59 GiB |    70.55 B | ROCm       |  99 |       32 |            pp64 |         58.02 ± 0.29 |
+| llama 70B Q4_K - Medium        |  39.59 GiB |    70.55 B | ROCm       |  99 |       32 |            tg64 |          4.57 ± 0.01 |
+
+build: d4c8e2c29 (9442)
+End:   18:50:11
+----
+
+========== TEST 4: -ngl 80 -ub 8 ==========
+Start: 18:50:11
+ggml_cuda_init: found 1 ROCm devices (Total VRAM: 62207 MiB):
+  Device 0: Radeon 8060S Graphics, gfx1151 (0x1151), VMM: no, Wave Size: 32, VRAM: 62207 MiB
+load_backend: loaded ROCm backend from /home/fuguang/bin/llama.cpp-b9442/libggml-hip.so
+load_backend: loaded RPC backend from /home/fuguang/bin/llama.cpp-b9442/libggml-rpc.so
+load_backend: loaded CPU backend from /home/fuguang/bin/llama.cpp-b9442/libggml-cpu-zen4.so
+| model                          |       size |     params | backend    | ngl | n_ubatch |            test |                  t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | --: | -------: | --------------: | -------------------: |
+| llama 70B Q4_K - Medium        |  39.59 GiB |    70.55 B | ROCm       |  80 |        8 |            pp64 |         12.22 ± 0.07 |
+| llama 70B Q4_K - Medium        |  39.59 GiB |    70.55 B | ROCm       |  80 |        8 |            tg64 |          4.44 ± 0.02 |
+
+build: d4c8e2c29 (9442)
+End:   18:51:58
+----
+
+========== TEST 5: -ngl 60 -ub 8 ==========
+Start: 18:51:58
+ggml_cuda_init: found 1 ROCm devices (Total VRAM: 62207 MiB):
+  Device 0: Radeon 8060S Graphics, gfx1151 (0x1151), VMM: no, Wave Size: 32, VRAM: 62207 MiB
+load_backend: loaded ROCm backend from /home/fuguang/bin/llama.cpp-b9442/libggml-hip.so
+load_backend: loaded RPC backend from /home/fuguang/bin/llama.cpp-b9442/libggml-rpc.so
+load_backend: loaded CPU backend from /home/fuguang/bin/llama.cpp-b9442/libggml-cpu-zen4.so
+| model                          |       size |     params | backend    | ngl | n_ubatch |            test |                  t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | --: | -------: | --------------: | -------------------: |
+| llama 70B Q4_K - Medium        |  39.59 GiB |    70.55 B | ROCm       |  60 |        8 |            pp64 |         10.95 ± 0.13 |
+| llama 70B Q4_K - Medium        |  39.59 GiB |    70.55 B | ROCm       |  60 |        8 |            tg64 |          3.03 ± 0.02 |
+
+build: d4c8e2c29 (9442)
+End:   18:54:21
+----
+
+ALL DONE 18:54:21
