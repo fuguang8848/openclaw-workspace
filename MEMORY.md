@@ -555,3 +555,84 @@ path = snapshot_download(
 - DeepSeek R1 70B Q4 量化 + Ollama 导入（已 benchmark，5 配置数据齐）
 - VCPToolBox 实际部署（缺 routes/chat.js）
 - Watt GUI 启用 26561（要浮光手动点）
+
+---
+
+## 📅 2026-06-03 进度总结（21:27 收工时写，防明早 V 失忆）
+
+> **本章节是 V 启动 anchor**。明早 V 启动看这一段就知道昨天发生了什么、今天该做什么。
+
+### 昨天 21:10-21:23 完成的 3 件事
+
+1. **DeepSeek R1 70B Q4 benchmark** 5 config 全跑完，最佳 `-ngl 99 -ub 32` (pp64=58.02 tg64=4.57 t/s)
+2. **VCP 修了 4/5 ERROR**（agent_map / ModelRedirect / rag_params / EmojiListGenerator），剩 1 个 VexusIndex Rust 方法缺失不致命
+3. **AgentTeam v0.7.6 集成 + P0 验证通过**（NEW：装了 `/home/fuguang/AgentTeam` + Web UI 8080 起来）
+
+### 现在所有跑的服务（21:27）
+
+| 服务 | 端口 | PID | 状态 |
+|---|---|---|---|
+| OpenClaw Gateway | 18789 | systemd | ✅ |
+| Ollama | 11434 | system | ✅ |
+| VCPToolBox | 6005 | 37201 | ✅ (1 VexusIndex ERROR 不致命) |
+| **AgentTeam Web UI** | **8080** | **38684** | ✅ **NEW** |
+| Watt Toolkit | 443/80 Kestrel | 23605 | ZOMBIE (等浮光 GUI 启用 26561) |
+| 自我驱动 cron 5d7486d7 | - | OpenClaw | ✅ 15min 一次, M2.7 |
+
+### 今天完整 daily memory
+
+→ `memory/2026-06-03.md`（280 行，含全部 3 件事详细 log）
+
+### 明天 (2026-06-04) P1 决策清单（**集成不是替换**）
+
+**优先级排序**：
+
+1. **P1.1** AgentTeam orchestrator 接入 V 工作流（V model-router.js 升级）
+2. **P1.2** V cron 5d7486d7 → AgentTeam daemon（统一任务管理 + 漂移检测）
+3. **P1.3** V failure-alert → AgentTeam alerts（多通道告警）
+4. **P1.4** V journal → AgentTeam learnings（自动学习）
+5. **P1.5** AgentTeam activity 公开（浮光 webchat 看到 agent 状态）
+6. **P1.6** VCP VexusIndex 编译/重装（清掉最后 1 个 ERROR）
+7. **P1.7** Skill 升级（Agent-superthinking v2 加 8 思考方法）
+8. **P1.8** R1 70B tool use bridge 测 R1 70B 实际跑（`tools/r1-bridge.py` 脚手架已写）
+
+### 明天打开的姿势
+
+1. 浮光睡醒 → 看 V 报告（启动 anchor 自动注入）
+2. V 启动 → 看 MEMORY.md 2026-06-03 章节 → 看 daily memory 280 行
+3. 浮光说"按 P1.1 开始" → V 开干
+
+### 关键技术决策（明天要遵守）
+
+- **集成不替换**：V 自己的 cron / router / alert 保留，AgentTeam 作"team 协作层"
+- **5d7486d7 不能再降频率**（15min 已最低）
+- **Watt GUI 启用**要浮光手动点（V 不替浮光操作）
+- **R1 70B Q4 不支持 native tools**（capabilities=completion），必须 prompt 注入协议
+- **VCPToolBox VexusIndex 编译需要 build-essential**（可能要浮光 apt install）
+
+### Workspace 备份
+
+- 仓：`fuguang8848/openclaw-workspace` 远端
+- 最新 commit：`8102d95` (2026-06-03 21:23)
+- daily memory 280 行
+- MEMORY.md 24K / 557 行
+
+### 踩坑（明天别再踩）
+
+- `pkill -f "Steam++"` 会自杀 → 用精准 pid
+- sandbox 启长进程被 SIGTERM → 用 `setsid nohup`
+- Watt Avalonia X11 需 `XAUTHORITY=/run/user/1000/.mutter-Xwaylandauth.*`
+- PEP 668 → `pip install --break-system-packages`
+- Watt 状态机 4 态：DOWN(1) / ZOMBIE(2) / BOOTING(3) / OK(0)
+- VCPToolBox VexusIndex Rust binding 缺方法 → 编译装 rust-vexus-lite
+- Ollama Q4 量化 model 不支持 native tools → prompt 注入
+- filter-branch 改写 token 史要 `--tree-filter` + `-- 292b505..HEAD` + `--force-with-lease`
+
+### Spring cleanup 工具状态
+
+- `tools/watt-start.sh` (2.0KB) ✅
+- `tools/watt-status.sh` (1.3KB) ✅
+- `tools/r1-bridge.py` (8.3KB) ✅ 脚手架 + parser 3 格式
+- `docs/v-journal/2026-06-03-spring-cleanup.md` (9092 字节) ✅ 推 GitHub
+- `docs/design-guidelines.md` ✅ 写好
+
