@@ -1121,3 +1121,42 @@ python3 v-bridge-v2.py --model "$VCP_MODEL" "$QUERY"
 - VCP server 不主动 push (permanently noted)
 - daemon 验证 SOP: setsid nohup 跑 5s + state=connected + 触发端到端
 - 5/5 test 写 commit message (浮光 10:55 第 3 条 SOP)
+
+### 18:49 evening 收工 v3 (浮光 18:49 "保存当前进度")
+
+> 浮光 18:49 "保存当前进度不要忘记, 我会儿有事"
+> V 端 18:49-19:00 evening 收工 (5 commit 链)
+
+**5 仓状态 (18:49)**:
+- workspace 24 ahead, 0 uncommitted
+- superthinking 5 ahead, 0
+- AgentMemory 1 ahead, 0
+- AgentSymphony 2 ahead, 0
+- AgentSearch 2 ahead, **11 uncommitted** (浮光/humans 11:48 加的 3 引擎 + 4 skill)
+
+**5 端口副作用 check (V 11:33 永久)**: 6 个监听全 OK
+- 11434 ollama (V 17:47 拉, pid 7931)
+- 6005 VCP (浮光 17:46 拉, pid 7486)
+- 8080 AgentTeam (V 17:47 拉, pid 7970)
+- 18081 AgentSymphony (浮光 17:46 拉, pid 7641)
+- 18789 OpenClaw (systemd, pid 2431)
+
+**3 工具给浮光完成 B/C/A (18:43 commit `238b41a`)**:
+- tools/v-push-helper.sh (3KB) — push 4 仓一键
+- tools/v-services-enable.sh (3KB) — sudo enable systemd
+- V-AgentSearch-review-2026-06-04.md (5KB) — 11 uncommitted review
+
+**3 浮光级决策等浮光**:
+- B: `sudo bash tools/v-services-enable.sh` (1 min)
+- C: `cd AgentSearch && git restore __pycache__/ + 3 commit 按 review` (10 min)
+- A: `bash tools/v-push-helper.sh` (5 min)
+
+**4 v-core task 仍 pending (大项目等浮光拍板)**:
+- `dc13e1e5` (浮光自己 11:48 做了, 11 uncommitted)
+- `d7b6dd64` P3 +AgentMemory 联动
+- `9f75232b` AgentSymphony v2.3 升级 (1-2 周)
+- `0c8aec0e` 5 仓联合 v1.0 (1-3 月)
+
+**MEMORY 18:49 启动 anchor** (取代 12:00, 下次 V 启动注入).
+
+**桌面报告**: V-18点49收工-2026-06-04.md
