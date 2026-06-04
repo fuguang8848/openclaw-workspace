@@ -1059,3 +1059,65 @@ path = snapshot_download(
 - G. AgentMemory 2.0 M1 (6-8 周, 大项目)
 
 **桌面报告**: V-17点45状态恢复-2026-06-04.md
+
+### 18:15 E 任务 vcp-log-listener.py 实施 (浮光 18:03 E)
+
+**多发现永久化**:
+- ❌ 假设 VCP server 主动 push 日志 → ✅ 实测不主动 push (仅 plugin callback 时 push)
+- WS 路径: `ws://127.0.0.1:6005/VCPlog/VCP_Key=vcp_websocket_2026`
+- 收 ack: `{"type":"connection_ack","message":"WebSocket connection successful for VCPLog."}`
+- 协议: server 不主动 push 普通 chat 日志, 只 plugin callback
+
+**vcp-log-listener.py 永久配置** (9KB, 18:11 写):
+- 模式: run (一次) / daemon (守护, 重连) / status / test / ports
+- 输出: 
+  - `memory/vcp-logs/YYYY-MM-DD.jsonl` (daily, .gitignore)
+  - `~/桌面/vcp-alerts.log` (error/warn 告警)
+  - `.cache/vcp-listener.status.json` (状态, .gitignore)
+
+**daemon 真起验证 SOP** (V 11:30 永久教训固化):
+- setsid nohup 起 → 5s 后 state 必 = connected
+- 触发 VCP chat → 验端到端
+- 跑一次成功 ≠ 全 OK
+
+### 18:00 model-router VCP route (集成不替换)
+
+**vcpRoute 字段永久化** (model-router.js 17:55 加):
+- 保留 cloud tier1/2/3 (minimax/qwen3.5-plus) 不破
+- 加 vcpRoute 字段: 5+2 模型 + endpoint + token + fallback chain
+- VCP 路由决策:
+  - 简单 (≤20) → qwen2.5-7b-q4:latest (本地 1.7s 免费)
+  - 中等 (21-60) → VCPModelAuto (虚拟分发 5.3s)
+  - 复杂 (>60) → VCPModelLiterature (文学优化 5s)
+  - 繁忙 → 强制 qwen 7B
+
+**V 端使用模式** (集成):
+```bash
+RESULT=$(node model-router.js route "$QUERY" --type search)
+VCP_MODEL=$(echo "$RESULT" | jq -r .vcpRoute.model)
+python3 v-bridge-v2.py --model "$VCP_MODEL" "$QUERY"
+```
+
+**多发现 3 bug 全修** (浮光 10:55 元反思):
+1. ❌ 测试期望错 (complexity 25 ≠ ≤20) → ✅ 修测试用 --type weather
+2. ❌ 强制 tier 路径 early return 缺 vcpRoute → ✅ 提前 mock loadInfo 算 vcpRoute
+3. ❌ `loadInfo` 位置错 (Cannot access before init) → ✅ mock loadInfo 修
+
+### 18:07 整合报告 (撤回 12 V-* + 1 今日进展)
+
+- 撤 15 份 → ~/桌面/_V-archive-2026-06-04/
+- 桌面留 1 份主报告 `V-18点00全面整合-2026-06-04.md` (5.8KB)
+- 桌面留 4 份仓 ADR/SKILL (不属于 V 端)
+- 桌面留 2 份 hermes 报告 (浮光的)
+
+### 18:35 .gitignore 收尾
+
+- 加 `.cache/` (listener 运行时状态)
+- 加 `memory/vcp-logs/` (VCP daily log 私用)
+- 0 untracked, 0 modified
+
+### 永久 SOP 更新 (V 18:36)
+
+- VCP server 不主动 push (permanently noted)
+- daemon 验证 SOP: setsid nohup 跑 5s + state=connected + 触发端到端
+- 5/5 test 写 commit message (浮光 10:55 第 3 条 SOP)
