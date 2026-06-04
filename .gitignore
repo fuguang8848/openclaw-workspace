@@ -44,3 +44,9 @@ htmlcov/
 # 本地 secrets
 .env
 *.local
+
+# V 端运行时缓存 (V 18:35 加)
+.cache/
+# VCP WS 监听 daily (V 18:35 加 — 不入库, daily memory 私用)
+memory/vcp-logs/
+# 桌面告警日志 (V 18:35 加)
