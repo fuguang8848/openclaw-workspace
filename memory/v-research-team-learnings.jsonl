@@ -7,3 +7,6 @@
 {"ts": "2026-06-04 11:15:41", "question": "v-cron 5min 降频到 10min 是否影响故障检测", "complexity": "simple", "subtasks": 1}
 {"ts": "2026-06-04 11:15:59", "question": "40岁要不要创业", "complexity": "complex", "subtasks": 5}
 {"ts": "2026-06-04 11:16:35", "question": "用 v6 + team 拆解 v-research-team 升级", "complexity": "simple", "subtasks": 2}
+{"ts": "2026-06-04 11:25:14", "question": "学习 hermes 对 VCP 深度思考报告, 评估 V 端可借鉴点, 端到端实验验证, 写入记忆系统", "complexity": "simple", "subtasks": 1}
+{"ts": "2026-06-04 11:31:59", "question": "把 r1-bridge.py 改造成 v-bridge-v2.py, 走 VCP 网关, 一次接 5 模型, 自动 fallback", "complexity": "simple", "subtasks": 1}
+{"ts": "2026-06-04 11:46:42", "question": "浮光 11:45 又说'组建专门团队, 按建议来'. V 已建 v-research-team (研究型 4 步). 浮光可能想要工程型团队 (实施) 还是加强 v-research-team?", "complexity": "simple", "subtasks": 2}
