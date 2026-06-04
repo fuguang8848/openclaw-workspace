@@ -69,6 +69,38 @@ const MODEL_TIERS = {
   }
 };
 
+// ── VCP 本地路由配置（V 17:55 新增：集成不替换）──────────────────────────
+// 来源：浮光 11:25 指示学习 hermes 对 VCP 思考报告，V 端借鉴 VCP 模型网关
+// 价值：一次接入 5+2 模型（本地 + 虚拟），替直接 Ollama，自动 fallback
+const VCP_CONFIG = {
+  endpoint: process.env.VCP_URL || 'http://127.0.0.1:6005/v1/chat/completions',
+  token: process.env.VCP_TOKEN || 'vcp_local_2026',
+  models: {
+    'qwen2.5-7b-q4:latest': { tier: 1, latency_ms: 1700,  cost: 0, local: true,  desc: '本地最快' },
+    'MiniMax-M3':            { tier: 1, latency_ms: 1800,  cost: 0.001, local: false, desc: '云 M3' },
+    'MiniMax-M2.7':          { tier: 1, latency_ms: 1700,  cost: 0.001, local: false, desc: '云 M2.7' },
+    'VCPModelAuto':          { tier: 2, latency_ms: 5300,  cost: 0.002, local: false, desc: '虚拟自动分发' },
+    'VCPModelLiterature':    { tier: 2, latency_ms: 5000,  cost: 0.002, local: false, desc: '虚拟文学优化' },
+    'deepseek-r1:70b-q4-4k': { tier: 3, latency_ms: 86000, cost: 0, local: true, desc: '本地 R1 70B iGPU 慢' },
+  },
+  fallback_chain: [
+    'qwen2.5-7b-q4:latest',
+    'MiniMax-M3',
+    'MiniMax-M2.7',
+    'VCPModelAuto',
+    'deepseek-r1:70b-q4-4k',
+  ],
+};
+
+// V 17:55: 路由策略
+// 复杂度 → 选 VCP model (不替 cloud route, 加 VCP 优先)
+function pickVcpModel(complexity, systemLoad) {
+  if (systemLoad === 'busy') return 'qwen2.5-7b-q4:latest'; // 繁忙走本地最快
+  if (complexity <= 20) return 'qwen2.5-7b-q4:latest';       // 简单走 qwen
+  if (complexity <= 60) return 'VCPModelAuto';              // 中等走虚拟分发
+  return 'VCPModelLiterature';                              // 复杂走文学优化
+}
+
 // 任务类型权重
 const TASK_TYPE_COMPLEXITY = {
   // 简单任务 (0-20)
@@ -177,12 +209,28 @@ function route(taskDescription, taskType = 'general', forcedTier = null) {
   // 强制层级（CLI 用）
   if (forcedTier && MODEL_TIERS[`tier${forcedTier}`]) {
     const tier = MODEL_TIERS[`tier${forcedTier}`];
+    // V 17:55 修：强制 tier 路径也返 vcpRoute (集成不替换)
+    // 提前计算一个 mock loadInfo (强制 tier 路径不走后面 loadInfo 逻辑)
+    const mockLoadInfo = { loadLevel: 0 };
+    const loadLevelName2 = ['free', 'normal', 'busy', 'critical'][mockLoadInfo.loadLevel] || 'normal';
+    const vcpModel2 = pickVcpModel(complexity, loadLevelName2);
+    const vcpMeta2 = VCP_CONFIG.models[vcpModel2] || {};
     return {
       tier: forcedTier,
       model: tier.name,
       complexity,
       estimated_cost: tier.cost_per_1k_tokens,
       skills,
+      vcpRoute: {
+        model: vcpModel2,
+        endpoint: VCP_CONFIG.endpoint,
+        token: VCP_CONFIG.token ? '***set***' : '(empty)',
+        latency_ms: vcpMeta2.latency_ms || '?',
+        cost_per_1k: vcpMeta2.cost ?? '?',
+        local: vcpMeta2.local ?? false,
+        desc: vcpMeta2.desc || '?',
+        fallback_chain: VCP_CONFIG.fallback_chain,
+      },
       reasoning: `Forced tier ${forcedTier}`
     };
   }
@@ -237,22 +285,39 @@ function route(taskDescription, taskType = 'general', forcedTier = null) {
     why: 'P1.1 集成：复杂任务建议分发到 AgentTeam v-core team，浮光 web UI 可见'
   } : { recommend: 'solo', triggers: atHints, why: 'V 单独处理即可' };
 
+  // ── V 17:55 集成 VCP 路由（集成不替换：cloud + vcp 双轨）───────────────
+  const loadLevelName = ['free', 'normal', 'busy', 'critical'][loadInfo.loadLevel] || 'normal';
+  const vcpModel = pickVcpModel(complexity, loadLevelName);
+  const vcpMeta = VCP_CONFIG.models[vcpModel] || {};
+  const vcpRoute = {
+    model: vcpModel,
+    endpoint: VCP_CONFIG.endpoint,
+    token: VCP_CONFIG.token ? '***set***' : '(empty)',
+    latency_ms: vcpMeta.latency_ms || '?',
+    cost_per_1k: vcpMeta.cost ?? '?',
+    local: vcpMeta.local ?? false,
+    desc: vcpMeta.desc || '?',
+    fallback_chain: VCP_CONFIG.fallback_chain,
+  };
+
   return {
     tier: finalTier,
-    model: finalTierInfo.name,
+    model: finalTierInfo.name,  // 保持 cloud model 不变
     complexity,
     estimated_cost: finalTierInfo.cost_per_1k_tokens,
     latency: finalTierInfo.latency,
     skills,
     skillCoverage,
-    loadInfo,  // 新增：负载状态
-    agentteamHint,  // P1.1：是否分发到 AgentTeam
+    loadInfo,
+    agentteamHint,
+    vcpRoute,  // V 17:55 新增：本地 VCP route (5+2 模型)
     reasoning: [
       `复杂度评分: ${complexity}/100`,
       skillCoverage ? `技能覆盖: ${skills.join(', ')}` : '无技能覆盖',
-      `系统负载: ${loadInfo.load1m} (${loadInfo.normalizedLoad}/核, ${loadInfo.usedMemPct}%内存)`,
+      `系统负载: ${loadInfo.load1m} (${loadInfo.normalizedLoad}/核, ${loadInfo.usedMemPct}%内存, ${loadLevelName})`,
       `负载惩罚: -${loadInfo.loadPenalty}分 → 调整后: ${effectiveScore}`,
-      `选择层级: tier${finalTier}`,
+      `Cloud 选择: tier${finalTier} → ${finalTierInfo.name}`,
+      `VCP 备选: ${vcpRoute.model} (${vcpRoute.desc}, ${vcpRoute.latency_ms}ms)`,
       `预估成本: ¥${(finalTierInfo.cost_per_1k_tokens * 1000).toFixed(4)}/1K tokens`,
       shouldDispatchToAT ? `→ AgentTeam 提示: dispatch (${Object.entries(atHints).filter(([_,v])=>v).map(([k])=>k).join(',')})` : '→ AgentTeam 提示: solo'
     ].join(' | ')
