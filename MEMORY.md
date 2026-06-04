@@ -849,3 +849,23 @@ path = snapshot_download(
 | AgentSymphony | `430dcf4` | 5 修复 + 1 伪修复 |
 | AgentMemory | `8e7ebbb` | 2.0 ADR + M1 plan |
 
+
+### 浮光 11:03 指示：V 端组建研究团队（v-research-team Skill — 永久 SOP）
+
+> 浮光 11:03: "加一条启用超级思考、agentteam、AgentSymphony，对每一次任务有更深入的思考。利用 skill 让 V 组建一个专门研究团队。"
+
+**实施**：
+- `~/.openclaw/plugin-skills/v-research-team/SKILL.md` (3.8KB)
+- `~/.openclaw/plugin-skills/v-research-team/executor.py` (6.8KB)
+- 4 步编排：superthinking v6 think_complex → AgentTeam → AgentSymphony → Learnings
+- Learnings 累 7 条 → `memory/v-research-team-learnings.jsonl`
+
+**V 端启动 anchor（永久 SOP）**：
+- ❌ 跳过 think_complex 直接执行 → ✅ 复杂任务**先思考后行动**
+- ❌ 单兵作战不用 team → ✅ 5-8 专家协作
+- ❌ 经验不收集 → ✅ Learnings 闭环自动晋升 SOUL.md
+- 调用: `python3 ~/.openclaw/plugin-skills/v-research-team/executor.py "任务描述"`
+
+**V 端"每次任务"用研究团队的边界**：
+- 调：研究/分析/思考/规划/决策/任何非琐碎任务
+- 不调：单步明确操作（"ls"/"cat"/"git status"）/ 浮光直接给答案 / 闲聊
