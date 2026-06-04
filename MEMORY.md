@@ -937,3 +937,33 @@ path = snapshot_download(
 - Check 5: chat_loop 无 tool 9 字
 
 **桌面报告**: `V-v-bridge-v2-VCP网关-2026-06-04.md`
+
+### 浮光 11:45 指示：V 端组建工程团队（v-engineering-team Skill — 永久 SOP）
+
+> 浮光 11:45: "组建专门团队，按照你的建议走"
+> V 端 11:45-11:48 实施（区别于 11:03 v-research-team 研究型）
+
+**实施**：
+- `~/.openclaw/plugin-skills/v-engineering-team/SKILL.md` (2.2KB)
+- `~/.openclaw/plugin-skills/v-engineering-team/executor.py` (5.6KB)
+- 5 步：分析 → 设计 → 实施 → 验证 → 部署
+- Step 4 验证含**副作用 check 5 端口**（V 11:33 永久教训）
+
+**V 端双团队 SOP（永久）**：
+
+| 任务类型 | 调 | 何时 |
+|---|---|---|
+| 思考/分析/规划/决策 | **v-research-team** | 任何非琐碎问"什么/为什么" |
+| 写代码/改代码/重构/集成/优化 | **v-engineering-team** | 任何非琐碎问"怎么做" |
+| 简单操作 | 不调 | `ls` / `cat` / `git status` / 单 commit |
+
+**v-engineering-team 5 步**：
+1. 分析 (superthinking v6 think_complex)
+2. 设计 (架构/测试/回滚/3 决策点)
+3. 实施 (主动 commit / commit message 完整 / 不堆积)
+4. 验证 (5/5 smoke + **5 端口副作用 check**)
+5. 部署 (commit + v-core + 桌面 + SOP)
+
+**调用**: `python3 ~/.openclaw/plugin-skills/v-engineering-team/executor.py "项目描述"`
+
+**桌面报告**: `V-工程团队Skill-2026-06-04.md`
