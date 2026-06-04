@@ -906,3 +906,34 @@ path = snapshot_download(
 - P2. TagMemoEngine 移植到 AgentMemory (6-8 周, hermes 阶段三)
 
 **桌面报告**: `V-学习hermes对VCP思考-2026-06-04.md`
+
+### 浮光 11:31 V 端 v-bridge-v2.py 改造 (2026-06-04 11:39)
+
+> 浮光: "按建议来"
+
+**实施**:
+- `tools/v-bridge-v2.py` (12KB) — 走 VCP 网关 + 5 模型 fallback
+- 5/5 smoke test 通过
+- 修复 V 11:30 副作用 (ollama runner 卡死)
+
+**V 11:30 误判副作用（新教训）**:
+- 跑 hermes 5 端到端实验触发 2 个 ollama runner 卡死 (pid 36803 187min CPU + 41577 111min CPU)
+- V 11:36 发现 + 同用户 kill 修复
+- **永久教训**：❌ "端到端成功" = 全 OK → ✅ 还要看 ollama / server 进程资源状态
+- 5/5 check 加 "副作用验证"
+
+**v-bridge-v2 永久配置**:
+- URL: `http://127.0.0.1:6005/v1/chat/completions`
+- Token: `vcp_local_2026`
+- Fallback 链: qwen2.5-7b-q4 → MiniMax-M3 → MiniMax-M2.7 → VCPModelAuto → R1 70B
+- 默认非流式 (V 11:30 验快 3-10 倍)
+- 3 次重试 + 指数 backoff (1s, 2s, 4s)
+
+**5/5 test 结果**:
+- Check 1: import + VCP URL/Token/5 fallback
+- Check 2: vcp_chat qwen 7B 4.42s
+- Check 3: vcp_chat MiniMax-M2.7 1.69s
+- Check 4: fallback chain 6.07s
+- Check 5: chat_loop 无 tool 9 字
+
+**桌面报告**: `V-v-bridge-v2-VCP网关-2026-06-04.md`
