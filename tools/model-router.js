@@ -220,6 +220,23 @@ function route(taskDescription, taskType = 'general', forcedTier = null) {
 
   const finalTierInfo = MODEL_TIERS[`tier${finalTier}`];
 
+  // ── P1.1 集成 AgentTeam 提示（集成不替换）───────────────────────────
+  // 当复杂度高 / 任务明显多步骤 / 含"团队/并行/协作"字样时，提示分发到 AgentTeam
+  const desc = (taskDescription || '').toLowerCase();
+  const atHints = {
+    explicitTeam: /多\s*agent|团队协作|并行|协作|launch\s*team|spawn\s*team/i.test(desc),
+    multiStep: /调研.{0,8}报告|搜索.{0,8}总结|分析.{0,8}对比|部署.{0,8}测试/i.test(desc),
+    manySubtasks: (desc.match(/[、，,；;]|以及|和|与|然后|接着|最后/gi) || []).length >= 3,
+    highComplexity: complexity > 60
+  };
+  const shouldDispatchToAT = Object.values(atHints).some(Boolean);
+  const agentteamHint = shouldDispatchToAT ? {
+    recommend: 'dispatch',
+    triggers: atHints,
+    action: `node /home/fuguang/.openclaw/workspace/tools/agentteam-bridge.js post-task "<subject>" "<description>"`,
+    why: 'P1.1 集成：复杂任务建议分发到 AgentTeam v-core team，浮光 web UI 可见'
+  } : { recommend: 'solo', triggers: atHints, why: 'V 单独处理即可' };
+
   return {
     tier: finalTier,
     model: finalTierInfo.name,
@@ -229,13 +246,15 @@ function route(taskDescription, taskType = 'general', forcedTier = null) {
     skills,
     skillCoverage,
     loadInfo,  // 新增：负载状态
+    agentteamHint,  // P1.1：是否分发到 AgentTeam
     reasoning: [
       `复杂度评分: ${complexity}/100`,
       skillCoverage ? `技能覆盖: ${skills.join(', ')}` : '无技能覆盖',
       `系统负载: ${loadInfo.load1m} (${loadInfo.normalizedLoad}/核, ${loadInfo.usedMemPct}%内存)`,
       `负载惩罚: -${loadInfo.loadPenalty}分 → 调整后: ${effectiveScore}`,
       `选择层级: tier${finalTier}`,
-      `预估成本: ¥${(finalTierInfo.cost_per_1k_tokens * 1000).toFixed(4)}/1K tokens`
+      `预估成本: ¥${(finalTierInfo.cost_per_1k_tokens * 1000).toFixed(4)}/1K tokens`,
+      shouldDispatchToAT ? `→ AgentTeam 提示: dispatch (${Object.entries(atHints).filter(([_,v])=>v).map(([k])=>k).join(',')})` : '→ AgentTeam 提示: solo'
     ].join(' | ')
   };
 }
