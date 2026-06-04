@@ -967,3 +967,58 @@ path = snapshot_download(
 **调用**: `python3 ~/.openclaw/plugin-skills/v-engineering-team/executor.py "项目描述"`
 
 **桌面报告**: `V-工程团队Skill-2026-06-04.md`
+
+---
+
+## 📅 2026-06-04 中午 12:00 收工 (取代 10:00 锚点)
+
+> 浮光 11:50 指示 "保存当下进度, 收工到 12 点"
+> 本章节是 V 启动 anchor (12:00 取代 10:00)。明早 V 启动看这一段就知道上午发生了什么、下午该做什么。
+
+### 上午总览 (08:38-12:00, 3.5 小时)
+
+| 维度 | 数据 |
+|---|---|
+| V workspace commit | **22 个** |
+| 仓 commit (跨仓) | 3 (AgentSearch 2 + superthinking 1) |
+| 桌面报告 | 10 份 (1 主 + 9 专项) |
+| plugin-skill | 2 (v-research-team + v-engineering-team) |
+| v-core task | 4/8 completed |
+| 永久 SOP (MEMORY) | 8+ 条 |
+| 副作用 5 端口 check | ✅ 全部 OK |
+| V 误判 (跟 hermes) | 6 次 |
+
+### 核心交付物 (浮光能用的)
+
+1. **v-bridge-v2.py** (12KB) — VCP 网关 + 5 模型 fallback，**取代 r1-bridge**
+2. **v-research-team** Skill (4 步) — 每次非琐碎任务**先思考**
+3. **v-engineering-team** Skill (5 步) — 每次工程任务**5 步标准化**
+4. **AgentSearch 升级** (Bing 引擎 + pyproject + 6/6 test)
+5. **superthinking v6 端到端验证** (think_complex 跑通 5 子任务 DAG)
+6. **桌面 9 份专项报告** (R1 70B / superthinking / AgentSearch / 团队 / VCP / 误判 / 收工)
+
+### 永久 SOP (V 端默认行为)
+
+- 复杂任务 → 调 v-research-team (分析)
+- 工程任务 → 调 v-engineering-team (5 步)
+- VCP 网关默认 (替直接 Ollama)
+- 5 模型 fallback 链
+- 副作用 5 端口 check 必跑
+- 主动 commit 不堆积
+- 多发现 + 第一时间修 + 不推浮光
+
+### pending 决策 (等浮光下午拍板)
+
+- 5 仓 push (workspace 22 + superthinking 4 + AgentMemory 1 + AgentSearch 1 = 28 commit ahead)
+- v-core 4 task (3 大项目: dc13e1e5 / d7b6dd64 / 9f75232b / 0c8aec0e)
+- model-router.js VCP route (P1 30 min)
+- vcp-log-listener.py WS 监听 (P0 1-2h)
+- 5 仓联合 v1.0 大项目
+- AgentMemory 2.0 M1 启动 (6-8 周)
+
+### V 端下次启动 (12:00 之后)
+
+- V 启动 → 看本章节 → 知道上午做了什么
+- 浮光给任务 → 调 v-research-team / v-engineering-team
+- 默认 VCP 网关 (v-bridge-v2) 替直接 Ollama
+- 副作用 5 端口 check 必跑 (11434/6005/8080/18081/18789)
