@@ -10,3 +10,6 @@
 {"ts": "2026-06-04 11:25:14", "question": "学习 hermes 对 VCP 深度思考报告, 评估 V 端可借鉴点, 端到端实验验证, 写入记忆系统", "complexity": "simple", "subtasks": 1}
 {"ts": "2026-06-04 11:31:59", "question": "把 r1-bridge.py 改造成 v-bridge-v2.py, 走 VCP 网关, 一次接 5 模型, 自动 fallback", "complexity": "simple", "subtasks": 1}
 {"ts": "2026-06-04 11:46:42", "question": "浮光 11:45 又说'组建专门团队, 按建议来'. V 已建 v-research-team (研究型 4 步). 浮光可能想要工程型团队 (实施) 还是加强 v-research-team?", "complexity": "simple", "subtasks": 2}
+{"ts": "2026-06-04 17:46:54", "question": "浮光 17:45 回来, 5h 离线. V 端先 5 仓 status + 5 端口副作用 check, 再看 v-cron/VCPLog 累计, 然后按建议推 pending 任务", "complexity": "simple", "subtasks": 1}
+{"ts": "2026-06-04 17:53:07", "question": "model-router.js 加 VCP route, 5 模型 + 2 虚拟模型分发, VCP 网关替直接 Ollama", "complexity": "simple", "subtasks": 1}
+{"ts": "2026-06-04 18:09:45", "question": "vcp-log-listener.py: 监听 VCP VCPLog WS 端点, 解析 log 写 daily memory + 桌面告警, 副作用 5 端口 check", "complexity": "simple", "subtasks": 1}
