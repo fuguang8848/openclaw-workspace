@@ -869,3 +869,40 @@ path = snapshot_download(
 **V 端"每次任务"用研究团队的边界**：
 - 调：研究/分析/思考/规划/决策/任何非琐碎任务
 - 不调：单步明确操作（"ls"/"cat"/"git status"）/ 浮光直接给答案 / 闲聊
+
+### 浮光 11:25 指示：学习 hermes 对 VCP 思考 + 端到端实验 + 永久 SOP（2026-06-04 11:36）
+
+> 浮光 11:25: "看看这个文件, 学习它, 实验走一下, 成功后加入记忆系统"
+
+**V 端 11 分钟实施**:
+- 读 hermes 8 章报告 ✅
+- v6 think_complex 拆解（苏格拉底, simple, 1 子任务）
+- 5 端到端 VCP 实验:
+  - qwen 7B 1.72s ✅
+  - VCPModelAuto 5.26s ✅
+  - MiniMax-M2.7 2.48s ✅
+  - R1 70B 20s timeout ❌ (iGPU 慢)
+  - 流式 18.50s ⚠️ (比非流式慢 3 倍)
+
+**V 端 3 新发现**:
+1. VCP 流式 18s vs 非流式 1.72s (多任务竞争 + 分块开销)
+2. VCPLog 不是文件 (WS 广播, 无 logs/ 目录)
+3. VCP 没 plugins/ 目录 (PluginManager 86KB 单独存在)
+
+**V 端借鉴 3 件事（永久 SOP）**:
+1. **model-router.js 加 VCP route** — 一次接 5 模型替 5 套 endpoint
+2. **r1-bridge.py 改 VCP 网关** — 1 套客户端 + 自动 fallback
+3. **V 端默认非流式** — 实测快 3 倍
+
+**V 端 VCP 网关配置（永久）**:
+- URL: `http://127.0.0.1:6005/v1/chat/completions`
+- Token: `Bearer vcp_local_2026`
+- 模型: qwen2.5-7b-q4 / deepseek-r1:70b-q4-4k / llama3.2:1b / VCPModelAuto / VCPModelLiterature / MiniMax-M3 / MiniMax-M2.7
+
+**V 端接下来能做的（等浮光决策）**:
+- P0. v-bridge-v2.py 改 VCP 网关 (30 min)
+- P0. vcp-log-listener.py WS 监听 (1-2h)
+- P1. model-router.js 加 VCP route (30 min)
+- P2. TagMemoEngine 移植到 AgentMemory (6-8 周, hermes 阶段三)
+
+**桌面报告**: `V-学习hermes对VCP思考-2026-06-04.md`
