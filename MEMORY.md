@@ -810,3 +810,42 @@ path = snapshot_download(
 - v5 `Jury.think()` outputs=0（v5 路径可能未真激活专家，v6 才激活）
 - 配置用 qwen 7B 不用 R1 70B（5.88 t/s vs 0.58 t/s）
 
+
+### V 端 superthinking v6 状态（永久）
+
+- v6 `Jury.think_complex()` 端到端跑通 ✅
+- "40岁要不要创业" → 5 子任务 DAG, 创业商业类型, complex 复杂度
+- v5 `Jury.think()` outputs=0（v5 路径可能未真激活专家，v6 才激活）
+- 配置用 qwen 7B 不用 R1 70B（5.88 t/s vs 0.58 t/s）
+
+### 浮光 10:55 新 SOP（永久 — 第 7 件元反思）
+
+> "每次做完一个项目后在总览一遍，把它在重构一遍。"
+> "多发现问题，多观察一下。发现的问题要第一时间解决而不是把问题推给我。"
+
+**V 端 4 条新 SOP**：
+
+1. **"做完项目 = commit + 总览 + 重构 + 回归 test"**（不是 commit 完就走）
+   - 重构清单（AgentSearch 升级示范）：缓存重复加载、精准异常、顶层 import、README 同步、补 smoke test
+2. **"多发现"清单（不推问题给浮光）**：
+   - 读 README vs 实际行为 diff（PEP 668、__init__ 依赖、README 漏引擎）
+   - 看 .pyc 是否要 .gitignore
+   - 看 imports 是否硬依赖（独立装包测试）
+   - 看 except 是否过宽（吞 KeyboardInterrupt/SystemExit 不行）
+3. **回归测试**：每个项目必加 smoke test，6/6 或 4/4 check 写在 commit message
+4. **V 端可做小事 ≠ 大项目**：
+   - V 端自动做：profile 脚本、smoke test、code refactor、Bing 集成、bug 修复
+   - 等浮光决策：push 远端（force-with-lease）、6-8 周大项目
+
+### AgentSymphony 5 修复 + AgentSearch 升级 commit 链（永久参考）
+
+| 仓 | commit | 描述 |
+|---|---|---|
+| superthinking | `a16b31e` | test: v6 smoke test 4/4 |
+| superthinking | `685a86a` | v6: 核心组件 |
+| superthinking | `f7b2ba8` | v6: SKILL.md + Jury.think_complex |
+| AgentSearch | `3b0e23f` | refactor: Bing 缓存 + 精准异常 + 6/6 test |
+| AgentSearch | `f310c7e` | feat: pyproject + Bing 引擎 |
+| AgentSymphony | `430dcf4` | 5 修复 + 1 伪修复 |
+| AgentMemory | `8e7ebbb` | 2.0 ADR + M1 plan |
+
