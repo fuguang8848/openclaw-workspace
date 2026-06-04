@@ -1,12 +1,12 @@
 {
-  "lastDayCheck": "2026-06-03T17:44:00+08:00",
+  "lastDayCheck": "2026-06-04T09:00:00+08:00",
   "lastWeekCheck": "2026-06-01T12:59:00+08:00",
   "lastErrorCount": 1,
   "lastChecks": {
     "email": 1745669640,
     "dream": 1745669580,
-    "brief": 1747735680,
-    "heartbeat": 1751275440,
+    "brief": 1780534913,
+    "heartbeat": 1780534913,
     "memory_review": 1751275440,
     "system_recovery": 1751275140
   },

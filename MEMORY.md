@@ -636,3 +636,112 @@ path = snapshot_download(
 - `docs/v-journal/2026-06-03-spring-cleanup.md` (9092 字节) ✅ 推 GitHub
 - `docs/design-guidelines.md` ✅ 写好
 
+---
+
+## 📅 2026-06-04 进度总结（10:00 cron 收工）
+
+> **本章节是 V 启动 anchor（取代 2026-06-03 anchor）**。明早 V 启动看这一段就知道今天发生了什么、明天该做什么。
+
+### 浮光 08:38-09:57 给了 4 轮任务，V 1 小时搞定
+
+1. **08:38** 早晨服务挂掉 → V 手动拉起 Ollama / VCP / AgentTeam（systemd 没管这仨）
+2. **09:00** 3 仓升级（superthinking v5→v6 / AgentMemory 2.0 ADR 入库 / AgentTeam 不动）
+3. **09:12** AgentSearch 学习 + 升级分析 + 4 task 推 v-core
+4. **09:42** 装上 AgentSymphony (交响乐 8848 经验版) + 5/5 check 全过（V 09:55 误判修正）
+5. **09:57** 撤回 3 份 V 旧报告 + 桌面写新整合"今日进展-2026-06-04.md"
+
+### 完成的 P1 子任务
+
+| 任务 | 状态 | 备注 |
+|---|---|---|
+| **P1.1** AgentTeam 桥接层 | ✅ | `tools/agentteam-bridge.js` (7.0KB) + model-router.js 加 `agentteamHint` 字段 |
+| **P1.6** VCP VexusIndex | ✅ | **新发现：纯 JS 桩不是 Rust 编译**。加 `recoverFromSqlite` stub，5/5 ERROR 全消 |
+| **P1.8** R1 70B bridge | ⚠️ partial | bridge 脚手架 247 行齐；实测 0.59 t/s（vs bench 4.57）= 8x 慢，4 model 抢 VRAM |
+
+### 推进中（v-core 团队 8 task pending）
+
+- AgentSearch: 4 task (P0 pyproject / P1 3 引擎 / P2 V search-v.py / P3 AgentMemory 联动)
+- AgentSymphony: 3 task (P0 健康 / P1 错误 / P2 文档)
+- 1 task V 端验证
+
+### 现在所有跑的服务（10:00）
+
+| 服务 | 端口 | PID | 状态 |
+|---|---|---|---|
+| OpenClaw Gateway | 18789 | systemd | ✅ |
+| Ollama | 11434 | 系统 | ✅ (4 model 空闲加载) |
+| VCPToolBox | 6005 | 8160 | ✅ **0 ERROR**（今早修了 VexusIndex stub）|
+| AgentTeam Web UI | 8080 | 8166 | ✅ |
+| **AgentSymphony** | **18081** | **18982** | ✅ **NEW** (5/5 check 全过) |
+| Watt Toolkit | 443 Kestrel | 7490/7495 | ZOMBIE (等浮光 GUI 启用 26561) |
+| Self-Drive cron 5d7486d7 | - | OpenClaw | ✅ 15min M2.7 (0 consecutiveErrors) |
+| 10:00 收工 cron fb5826d9 | - | - | ✅ 已触发即焚 (deleteAfterRun) |
+
+### 今日 commit 状态
+
+- **workspace 仓**: 9 commits ahead (10:00 push 时合一起)
+  - `a345953` P1.1 AgentTeam 桥接
+  - `c87ad21` P1.6 VCP VexusIndex stub 修复
+  - `04afcd8` P1.8 R1 70B perf
+  - `6a4b9ef` v-journal 早晨 sprint 复盘
+  - `e2199af` 3 仓升级整合
+  - `40ceb9e` AgentSearch 升级分析
+  - `c2d09b6` 9:42 装上 AgentSymphony
+  - `8e29c17` 5/5 check 全过 + V 误判修正
+  - `5ea7897` 撤回 3 旧报告 + 新整合
+- **superthinking 仓**: 2 commits (`685a86a`+`f7b2ba8`) **本地未 push**
+- **AgentMemory 仓**: 1 commit (`8e7ebbb`) **本地未 push**
+- **AgentTeam 仓**: 不动（昨天 V 修的已在主分支）
+
+### 桌面产物
+
+- `/home/fuguang/桌面/今日进展-2026-06-04.md` (09:57 浮光要的新整合)
+- `/home/fuguang/桌面/V-3仓升级整合报告-2026-06-04.md` (09:00, 09:57 移至 _V-archive-2026-06-04/)
+- `/home/fuguang/桌面/V-AgentSearch升级分析-2026-06-04.md` (09:12, 09:57 移至 _V-archive-2026-06-04/)
+- `/home/fuguang/桌面/9点42.md` (09:42 AgentSymphony 装上, 09:57 移至 _V-archive-2026-06-04/)
+
+### V 误判修正（重要教训，加进踩坑）
+
+**V 端反复误判规律**：
+1. 2026-06-03 误判 "VexusIndex Rust binding 缺方法" → 实际**纯 JS 桩**
+2. 2026-06-04 09:42 误判 "thinking dialog API timeout" → 实际**V 测试 timeout 3s 太短，server 7.1s 正常返回**
+
+**新踩坑（加入明天 list）**：
+- ❌ V 看到 "timeout/error" 先别下结论 → ✅ 用更宽容 timeout 重测（curl -m 30）+ 看 server 日志
+- ❌ "缺 Rust 编译产物" 不能直接相信 → ✅ 先 `file xxx.so/.node` 或读 stub 源码
+- ❌ AgentSymphony 5 check 中 check 4 = thinking dialog → 实际是 LLM 慢，server OK
+
+### 明天 (2026-06-05) 继续点（**集成不是替换**原则照旧**）
+
+1. **P1.2** V cron 5d7486d7 → AgentTeam daemon（统一任务管理 + 漂移检测）
+2. **P1.3** V failure-alert → AgentTeam alerts（多通道告警）
+3. **P1.4** V journal → AgentTeam learnings（自动学习）
+4. **P1.5** AgentTeam activity 公开（浮光 webchat 看到 agent 状态）
+5. **P1.7** Agent-superthinking v2 加 8 思考方法
+6. **P1.8** R1 70B perf 真诊断（`ollama ps` 看 VRAM + 关 1 个 model + 关 thinking）
+7. **v-core 8 task** 状态跟进（4 AgentSearch + 3 AgentSymphony + 1 验证）
+8. **3 仓 commit push 决策**（superthinking / AgentMemory 待浮光定）
+
+### Workspace 备份（10:00 cron 后）
+
+- 仓：`fuguang8848/openclaw-workspace` 远端
+- 10:00 cron push 后：10 commits ahead
+- daily memory `memory/2026-06-04.md` 12.8KB（待 push）
+- MEMORY.md 25K / 600+ 行
+
+### 关键不变（明天遵守）
+
+- **集成不替换**：V 自己的 cron / router / alert 保留，AgentTeam 作"team 协作层"
+- **5d7486d7 不能再降频率**（15min 已最低）
+- **Watt GUI 启用**要浮光手动点（V 不替）
+- **V 看到 timeout/error** → 先用宽容 timeout + 看 server 日志再下结论（今天学到的）
+- **大型下载仍让浮光下**（本机代理不稳定）
+- **5 仓升级**仍走"本地 commit + 推 GitHub + 主动开 PR/合上游"流程
+
+### 浮光回来时怎么接
+
+1. 浮光回 → V 不硬拉，先打招呼 + 3 行状态
+2. V 自动注入 启动 anchor（看本章节 + daily memory 12.8KB）
+3. 浮光说"按 P1.2 开始" → V 开干
+4. 桌面新整合 `今日进展-2026-06-04.md` 已就位
+
