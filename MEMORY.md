@@ -1022,3 +1022,40 @@ path = snapshot_download(
 - 浮光给任务 → 调 v-research-team / v-engineering-team
 - 默认 VCP 网关 (v-bridge-v2) 替直接 Ollama
 - 副作用 5 端口 check 必跑 (11434/6005/8080/18081/18789)
+
+### 浮光 17:45 回来 — V 端 5h 状态恢复 (2026-06-04 17:50)
+
+> 浮光 17:45 回 (5h+ 离线)
+> V 端 17:46-17:50: 5 端口 check + 拉起 ollama + agentteam
+
+**5h 期间发生**:
+- ollama 11434 死了 (12:00-17:46)
+- AgentTeam 8080 死了
+- 浮光 17:46 手动启 VCP + AgentSymphony (但没启 ollama + agentteam)
+- V 17:47 拉起 ollama + agentteam
+
+**永久教训 (新)**:
+- ❌ V 11:30 永久记忆写"浮光 09:00 enable 了 v-services-restart" → **实际 `is-enabled` 是 `disabled`**
+- 误判根因: 看 `/etc/systemd/system/xxx.service` 存在 = 已 enable
+- **新永久 SOP**: 写永久记忆前 `systemctl is-enabled <unit>` 真验证
+- 跟 hermes 9:42 4.1 误判是同毛病 (看描述/报告下结论, 不验证当前状态)
+
+**5 仓状态 (17:50)**:
+- workspace 16 ahead, 0 uncommitted
+- Agent-superthinking 5 ahead, 0 uncommitted
+- AgentMemory 1 ahead, 0 uncommitted
+- AgentSymphony 2 ahead, 0 uncommitted
+- AgentSearch 2 ahead, 11 uncommitted (浮光/humans 11:48 加的 3 引擎 + 4 skill, V 不 commit)
+
+**24 commit ahead 等 push**.
+
+**7 pending 决策 (V 推荐顺序)**:
+- B. systemd enable v-services-restart (1 min, 浮光级)
+- C. AgentSearch 11 uncommitted review+commit (10 min, 浮光级)
+- A. push 4 仓 (5 min, 浮光级 force-with-lease)
+- D. model-router.js VCP route (30 min, V 可做)
+- E. vcp-log-listener.py WS 监听 (1-2h, V 可做)
+- F. 5 仓联合 v1.0 (1-3 月, 大项目)
+- G. AgentMemory 2.0 M1 (6-8 周, 大项目)
+
+**桌面报告**: V-17点45状态恢复-2026-06-04.md
