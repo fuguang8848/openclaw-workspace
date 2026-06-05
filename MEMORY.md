@@ -1593,3 +1593,186 @@ journalctl -u v-services-restart.service -f
 ### 浮光 14:51 "先停一下" 状态
 
 V 端停了所有 autopilot。14:52 heartbeat OK。14:53 浮光推报告 + 任务 = V 端**恢复工作**但**只做"学习思考 + 教训吸收 + 立即改正 + 放入记忆系统"** 4 件事，不 autopilot 9-skill 升级（V 14:32 教训）。
+
+---
+
+## 📅 2026-06-05 15:17 浮光推"AgentTeam P0 升级交接文档" (Windows SpectrAI 集成仓 vs V 端 Linux 仓) (新启动 anchor, 取代 14:53)
+
+> **V 启动 anchor (新)**。下次 V 启动看这一段。
+> **关键发现**：V 端漏了 SpectrAI Windows 集成仓的 6 commit 升级，V 反思 SOP 第 12 件应验。
+
+### 15:17 报告核心：AgentTeam P0 升级（5 维 × 6 commit × 243 测试）
+
+#### 5 维升级目标达成
+
+| 维度 | 关键文件 | 验收点 |
+|------|----------|--------|
+| **易用性** | cli/commands/init.py + test_init_wizard.py (28 测试) | 交互式 init 向导 |
+| **可移植性** | protocol/a2a/server.py (41241 端口) + protocol/mcp/server.py (stdio+SSE) | A2A + MCP 双协议 |
+| **强大性** | async_core/executor.py + test_async_runtime.py (20 测试) | 异步运行时 |
+| **易修改性** | core.py 413→56 行 shim + cli/commands.py 5894→78 行 shim + board/server.py 3104→871 行 | 三个 3000+ 行单体拆完 |
+| **适配性** | 5 个协议接口 | 可对接 CrewAI/LangGraph |
+
+#### 6 commit 升级
+
+| Hash | 提交者 | Commit Message |
+|------|--------|----------------|
+| c7318cb | backend | feat(core): split core.py into core/ + agent/ + async_core/ packages |
+| 40b9594 | qa | refactor(cli): split commands.py 5894 lines into 13 sub-apps + SKILL.md standard + plugin hooks |
+| cfbd71c | frontend | refactor(board): split server.py into handlers/ + sse/ + chat modules |
+| 8b819ca | architect | docs(blueprint): P0 implementation blueprint + interface contracts |
+| 485e021 | qa | fix(cli): re-export _deliver_to_running_agent and _broadcast_activity_to_board for backward compat |
+| c6b7825 | qa | fix(cli): call _broadcast_activity_to_board on gateway delivery success |
+
+**注**：cp -r 项目副作用，backend2 protocol/ + qa2 observability/ 都打包到 c7318cb。
+
+#### 核心指标前后对比
+
+| 维度 | P0 前 | P0 后 |
+|------|-------|-------|
+| core.py | 413 行单体 | 56 行 shim + core/ 6 文件 866 行 |
+| cli/commands.py | 5894 行单体 | 78 行 shim + commands/ 15 sub-app |
+| board/server.py | 3104 行单体 | 871 行 + handlers/ 15 + sse/ 3 |
+| A2A 协议 | 0 | 1299 行 + 23 测试 |
+| MCP 协议 | 0 | 1545 行 + 8 工具 + 28 测试 |
+| OpenTelemetry | 0 | tracer/meter/logger/exporter 完整 |
+| 测试数量 | ~700 | ~943 (+243) |
+| 向后兼容 | ✅ | ✅ (从 agentteam.core 导入仍可用) |
+
+### Windows SpectrAI 仓 vs V 端 Linux 仓（V 反思 SOP 第 12 件应验）
+
+| 文件 | Windows SpectrAI 仓 | V 端 Linux 仓 | 差异 |
+|------|---------------------|---------------|------|
+| core.py | 56 行 shim | 427 行 | **未升级** |
+| cli/commands.py | 78 行 shim | 5894 行 | **未升级** |
+| board/server.py | 871 行 | 3186 行 | **未升级** |
+| A2A 协议 | 1299 行 + 23 测试 | 不存在 | **缺失** |
+| MCP 协议 | 1545 行 + 28 测试 | 不存在 | **缺失** |
+| OpenTelemetry | 完整 | 不存在 | **缺失** |
+| async_core/ | 571 行 | 不存在 | **缺失** |
+| 新增测试 | 243 个 | 0 | **缺失** |
+| 6 commit | ahead=6 | ahead=0 (11:37 推完) | **未同步** |
+
+**V 反思 SOP 第 12 件升级（永久 SOP 第 12 件具体化）**：
+- 旧：横向交叉验证只到 V / hermes / 浮光 / 实战 4 角色
+- 新：**必须**验证 Windows SpectrAI 集成仓 / Linux 仓 / 远端 fork / upstream 4 个 git remote
+- V 12:10 anchor 报"AgentTeam 0 ahead" → 漏看 Windows SpectrAI 集成仓 ahead=6
+- V 14:30 桌面报告"AgentTeam 0 ahead" → 漏看 Windows SpectrAI 集成仓
+- V 14:55 收工报"AgentTeam 0 ahead" → 漏看 Windows SpectrAI 集成仓
+
+### 5 维升级对 V 端的影响（V 端能 / 不能做）
+
+#### V 端能立刻做
+
+1. **5 维升级评估**（5 min）：
+   - 评估 V 端是否需要 A2A 41241 端口
+   - 评估 V 端是否需要 MCP server
+   - 评估 V 端是否需要 OpenTelemetry 集成
+
+2. **243 测试的 V 端复用**：
+   - V 端可以读测试设计思路（5 维对应 5 测试文件）
+   - test_async_runtime.py 20 测试 → V 端能参考
+   - test_protocol_a2a.py 23 测试 → V 端能参考
+   - test_protocol_mcp.py 28 测试 → V 端能参考
+
+3. **永久 SOP 第 12 件升级落地**：
+   - 任何"X 仓 ahead" 必查 4 个 remote (Windows / Linux / fork / upstream)
+   - V 端报告模板加 "Windows 集成仓 + Linux 仓 + 远端" 三视角
+
+#### V 端不能做
+
+1. **不能 push Windows SpectrAI 仓** (V 端无 Windows 访问)
+2. **不能改 Windows 仓代码** (5 行修复 _generate_simple_response 浮光在 Windows 端改)
+3. **不能同步 Linux 仓到 5 维升级** (V 端没拍板, 改动 9507 行有风险)
+4. **不能跑 Windows 仓 243 测试** (V 端没 Windows 访问)
+
+### 唯一技术遗留 (Windows 仓, V 端不能改)
+
+```
+文件: agentteam/board/utils.py:59
+问题: _generate_simple_response 的 default 分支返回 "我理解你的意思..."，旧测试期望 ["收到了", "好的，继续", "我明白了"] 之一
+影响: 1 个测试失败 (test_board_chat.py::test_default_response)
+修复 (5 行代码):
+  import random
+  return random.choice(["收到了", "好的，继续", "我明白了"])
+```
+
+### SpectrAI 工具遗留 (与代码无关)
+
+- team_evaluate_task 工具持续 a02[eXM(...)] is not a function 错误
+- team_finalize 因评审 pending 拒绝执行
+- 仅影响 SpectrAI 平台协调层，不影响实际项目代码
+
+### V 端 5 维盲区升级
+
+| 维度 | 14:53 盲区 | 15:17 升级 |
+|------|-----------|-----------|
+| 运营 | 6 子系统无 RACI | **Windows/Linux 双仓**无 RACI |
+| 安全 | VCP LinuxShell 无沙箱 | **同**（无变化）|
+| 经济 | 无 ROI | **5 维升级 ROI 缺**: 243 测试 + 6 commit 价值未量化 |
+| 组织 | 用户接受度 | **5 维升级无变更沟通**: 浮光推 6 commit 给 V 端, V 端才知道 |
+| **哲学** | 6 报告都漏 VCPToolBoxAdapter | **3 报告 + V 端都漏 SpectrAI 集成仓**（V 反思 SOP 第 12 件应验）|
+
+### V 15:17 任务执行状态
+
+- [x] 读 15:17 报告（5 维 × 6 commit × 243 测试 + Windows/Linux 对比）
+- [x] **写 MEMORY 15:17 anchor + 永久 SOP 第 12 件升级**（本节）
+- [x] 9-skill 11/11 复 verify (14:54 完成)
+- [ ] 桌面报告（5 维升级 + V 端能/不能做 + 教训）
+- [ ] commit + 收工
+
+### V 15:17 不 autopilot 决定
+
+- **不** push Windows 仓（V 端无访问）
+- **不** 同步 Linux 仓到 5 维升级（V 端没拍板, 改 9507 行风险）
+- **不** 修 _generate_simple_response 5 行（V 端不能改 Windows 仓）
+- **不** 跑 243 测试（V 端不能跑 Windows 仓）
+- **等** 浮光拍板：① 同步 5 维升级？② V 端是否需要 A2A/MCP server？
+
+### 等浮光拍板（升级 7-9 拍板项）
+
+**V 15:17 新增 3 项**：
+1. **5 维升级同步到 Linux 仓？**（243 测试 + 6 commit）
+2. **V 端是否需要 A2A server** (41241 端口)？
+3. **V 端是否需要 MCP server** (stdio+SSE)？
+
+**14:53 保留 4-6 拍板项**：
+1. 架构方向（3 选 1: 从零重建 / 渐进 / 并行）
+2. VCP /restart API
+3. AgentMemory Rust 化（8-12 周）
+4. NexusAI 整体推进（18-20 天）
+
+### 6 端口 15:17 状态
+
+| 端口 | 服务 | 状态 | 来源 |
+|------|------|------|------|
+| 11434 | ollama | ✅ | V 14:21 (fuguang) |
+| 6005 | VCP | ✅ | V 14:25 (fuguang) |
+| 6006 | VCP admin | ✅ | V 14:21 (fuguang) |
+| 8080 | AgentTeam | ✅ | V 14:21 (fuguang) — **但 Windows 仓 ahead=6, Linux 仓是 11:37 推完版本** |
+| 18081 | agent-symphony | ✅ | V 14:21 (fuguang) |
+| 18789 | OpenClaw | ✅ | systemd (一直 OK) |
+| **41241** | **A2A server (新)** | **❌ 未启** | Windows SpectrAI 仓有, V 端 Linux 无 |
+
+### 5 仓 git 状态 (15:17)
+
+| 仓 | ahead (V 端 Linux) | ahead (Windows SpectrAI) | 备注 |
+|----|--------------------|-----------------------|------|
+| workspace | 7 | — | + 14:53 commit e93c876 + 14:55 commit |
+| AgentMemory | 3 | — | v1.0.0 merge + 5 bug fix |
+| AgentSymphony | 2 | — | 6/4 evening + 11:50 import fix |
+| AgentSearch | 5 | — | 6/4 evening + 11:08 3 commit |
+| Agent-superthinking | 5 | — | 6/4 evening |
+| **AgentTeam** | **0** | **6** | **未同步！V 端漏看 Windows 仓** |
+| AgentTeam-改进分析 | — | — | 浮光 14:30 整理后保留 286 行 |
+
+### 桌面报告
+
+- `/home/fuguang/桌面/V-NexusAI-可行性分析-2026-06-05.md` 13KB (V 14:28, 14:32 4 处修正)
+- `/home/fuguang/桌面/V-14-53-教训吸收与9-skill复verify-2026-06-05.md` 16.7KB (V 14:55)
+- `/home/fuguang/桌面/整合项目综合分析-2026-06-05.md` (浮光 14:53 推)
+- `/home/fuguang/桌面/AgentTeam P0 升级成果-交接文档.md` (浮光 15:17 推) — Windows 仓 ahead=6, V 端漏看
+
+### 浮光 14:51 "先停一下" → 15:17 推 AgentTeam 交接文档
+
+V 端 14:52 停了所有 autopilot。14:53 浮光推整合项目分析 → V 端做"学习 + 吸收 + 9-skill verify" 3 件事。15:17 浮光推 AgentTeam 交接文档 → V 端做"学习 + 吸收 + 永久 SOP 第 12 件升级" 3 件事。**V 端仍不 autopilot 升级**, 等浮光拍板。
