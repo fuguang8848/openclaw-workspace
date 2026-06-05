@@ -1,5 +1,5 @@
 [Unit]
-Description=V 长期服务的轻量守护 (Ollama / VCPToolBox / AgentTeam Board)
+Description=V 长期服务的轻量守护 (Ollama / VCPToolBox / AgentTeam Board / agent-symphony)
 # 不依赖 ollama/vcp/agentteam，只在 libvirtd 起来后兜底拉起
 After=network-online.target
 Wants=network-online.target
@@ -12,6 +12,7 @@ ExecStart=/bin/bash -c '\
   curl -sS -m 2 http://127.0.0.1:11434 >/dev/null 2>&1 || (cd /home/fuguang && setsid nohup /home/fuguang/bin/ollama serve >/home/fuguang/.ollama/server.log 2>&1 </dev/null & disown); \
   curl -sS -m 2 -o /dev/null -w "" http://127.0.0.1:6005 2>/dev/null; [ $? -ne 7 ] || (cd /home/fuguang/VCPToolBox && setsid nohup node server.js >/tmp/vcp.log 2>&1 </dev/null & disown); \
   curl -sS -m 2 http://127.0.0.1:8080 >/dev/null 2>&1 || (cd /home/fuguang/AgentTeam && setsid nohup /home/fuguang/.local/bin/agentteam board serve --port 8080 >/tmp/agentteam.log 2>&1 </dev/null & disown); \
+  curl -sS -m 2 http://127.0.0.1:18081 >/dev/null 2>&1 || (cd /home/fuguang/agent-symphony && setsid nohup python3 -m server.symphony_server >/tmp/symphony.log 2>&1 </dev/null & disown); \
   exit 0'
 RemainAfterExit=yes
 StandardOutput=journal
