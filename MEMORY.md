@@ -1160,3 +1160,90 @@ python3 v-bridge-v2.py --model "$VCP_MODEL" "$QUERY"
 **MEMORY 18:49 启动 anchor** (取代 12:00, 下次 V 启动注入).
 
 **桌面报告**: V-18点49收工-2026-06-04.md
+
+---
+
+## 📅 2026-06-05 进度总结 (12:10 evening 收工)
+
+> **V 启动 anchor (新, 取代 18:49 6/4 evening)**。下次 V 启动看这一段。
+
+### 浮光 11:47 任务：启动 9-skill + 升级 + 桌面报告 + 反思
+
+**执行时间**：11:50-12:10 (20 min)
+
+### 9-skill 全部 alive
+
+| # | Skill | 端到端验证 |
+|---|-------|------------|
+| 1 | superthinking (v6) | 18/18 tests pass, Jury.think_complex OK |
+| 2 | v-research-team | executor 4 步编排 OK |
+| 3 | agentmemory (v1.0.0) | **331/331 tests pass, 4 层 OK** |
+| 4 | AgentSymphony (v2.0.0) | 9/10 integration, SymphonySession OK |
+| 5 | agentsearch | 10/10 smoke + 73 unit tests pass |
+| 6 | VCP (VCPToolBox) | 6005/6006 跑, /admin_api/server/lifecycle OK |
+| 7-9 | Safety/Supervisor/Manager (AgentSearch 内置) | 端到端 OK |
+
+### 3 真修复（V 端动手）
+
+1. **AgentMemory v1.0.0**: merge + 5 bug 修复 (8 个 test_*.py import 改 + conftest sys.path + 4 个 __init__ import + MCP SDK 1.27.1 API 改 description→instructions + risk_level→meta)
+2. **AgentSymphony test_integration**: 修 import 路径 (agent_symphony.X → X), 9/10 通过
+3. **superthinking**: pip install -e . (装 super_thinking 0.1.0), 18/18 通过
+
+### 3 真发现（等浮光拍板）
+
+1. **SpectrAI 仓是混合包**（416 真 TSX + 459 编译后 JS + src/src/ 嵌套）— 不能直接重 build
+2. **VCP /restart API 真缺失** — 只有 /lifecycle, 缺 POST 触发 gracefulShutdown
+3. **VCPToolBoxAdapter 写了但没注册** — 死代码 (11:45 报告"已注册"是误判)
+
+### 6/4 evening 报告漏 2 个 hidden error (浮光 6/5 11:47 "多看一眼" 抓到)
+
+- AgentSymphony test_integration.py **10 collection errors** (V 6/4 报"5/5 check"漏的)
+- superthinking test_core.py **1 collection error** (V 6/4 报"v6 smoke 4/4"漏的)
+
+### V 反思 (永久 SOP 第 7 件 — 6/5 12:10)
+
+**浮光 6/4 10:42 元反思第 N 次应验**: "快速验证容易漏掉细粒度问题"
+
+**根因**：
+- `pytest -q` 跑时 collection error **中断**早退, 只看 summary pass 数字不知道
+- V 6/4 evening 验 9-skill 只跑 import + instantiate, **没真跑 test 套**
+- "5/5 check" / "v6 smoke 4/4" 类报告 = 浅验证, **不是真验证**
+
+**新 SOP (永久)**:
+```bash
+# 旧 (漏 collection error)
+pytest tests/ -q | tail -3
+
+# 新 (强制看完)
+pytest tests/ --continue-on-collection-errors --tb=no -q | tail -5
+# 看: passed + failed + skipped + errors 四个数
+```
+
+**V 报告模板必含**:
+- pytest collection error count
+- 真 pass/fail/skip 数字
+- 跑测命令全文 (不是"我跑了一下")
+
+### 5 仓 git 状态 (12:10)
+
+| 仓 | ahead | 备注 |
+|----|-------|------|
+| workspace | 1 | (v-push-helper + evening daily) |
+| AgentMemory | 3 | (v1.0.0 merge + 5 bug fix) |
+| AgentSymphony | 2 | (6/4 evening + 11:50 import fix) |
+| AgentSearch | 5 | (6/4 evening + 11:08 3 commit) |
+| Agent-superthinking | 5 | (6/4 evening) |
+| AgentTeam | 0 | (11:37 推完) |
+
+### 5 端口全 OK (含 6006 adminServer 11:50 V 拉起)
+
+### 浮光 4 个拍板项
+
+1. **VCP /restart API** 加不加?
+2. **SpectrAI 仓** 等上游 / 抽组件 / 用 out/?
+3. **5 仓 ahead 推远端**?
+4. **VCPToolBoxAdapter** 注册 / 删?
+
+### 桌面报告
+
+`/home/fuguang/桌面/V-9-skill升级-2026-06-05.md` (11.7KB)
