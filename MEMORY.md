@@ -1193,7 +1193,7 @@ python3 v-bridge-v2.py --model "$VCP_MODEL" "$QUERY"
 
 1. **SpectrAI 仓是混合包**（416 真 TSX + 459 编译后 JS + src/src/ 嵌套）— 不能直接重 build
 2. **VCP /restart API 真缺失** — 只有 /lifecycle, 缺 POST 触发 gracefulShutdown
-3. **VCPToolBoxAdapter 写了但没注册** — 死代码 (11:45 报告"已注册"是误判)
+3. ~~**VCPToolBoxAdapter 写了但没注册**~~ — ❌ **14:32 修正**: VCPToolBoxAdapter.ts **不存在**。V 12:10 端凭印象写, 没 grep 验证. VCP 整体不是 git 仓库.
 
 ### 6/4 evening 报告漏 2 个 hidden error (浮光 6/5 11:47 "多看一眼" 抓到)
 
@@ -1242,7 +1242,7 @@ pytest tests/ --continue-on-collection-errors --tb=no -q | tail -5
 1. **VCP /restart API** 加不加?
 2. **SpectrAI 仓** 等上游 / 抽组件 / 用 out/?
 3. **5 仓 ahead 推远端**?
-4. **VCPToolBoxAdapter** 注册 / 删?
+4. ~~**VCPToolBoxAdapter** 注册 / 删?~~ ❌ 14:32 修正: 不存在
 
 ### 桌面报告
 
@@ -1289,6 +1289,28 @@ pytest tests/ --continue-on-collection-errors --tb=no -q | tail -5
 | curl -m 2 检测 | ss -tln 检测 (启动慢误判) |
 | /tmp/*.log (root 写) | /tmp/v-*.log (fuguang 写) |
 
+### 永久 SOP 第 9 件 (6/5 14:32 报告"已修复"必 grep 真验证)
+
+| 旧（错）| 新（对）|
+|---------|---------|
+| 凭"我记得读过"写"已修复" | **必 grep 真验证** 1) 文件存在 2) 函数注册 3) 版本号对 |
+| 同一错 12:10→12:53→14:30 报 3 次 | 报告前跑 verify 脚本, 写 verify 输出到 commit |
+| 浮光 silent approve = V autopilot 升级 | **停手报告 + 等浮光确认** 才能做升级 |
+
+**根因 (6/5 14:31 4 处幻觉)**:
+- V 12:10 evening anchor: "VCPToolBoxAdapter 139 行, 没注册到 AdapterRegistry"
+- V 12:46 verify 报"死代码" (V 反思 SOP #1 应验)
+- V 14:30 桌面报告 + MEMORY anchor + 6 拍板项 全部沿用这条幻觉
+- **14:31 grep 整个 VCP 源 0 引用, 文件不存在, VCP 也不是 git 仓库**
+
+**V 端不 autopilot 5 项升级决策 (6/5 14:32)**:
+- 不删 VCPToolBoxAdapter (它不存在)
+- 不加 VCP /restart API (破坏性 + 没拍板)
+- 不推 5 仓 ahead (VCP 不是 git; 浮光没明确)
+- 不做 AgentSearch 4 skill util 化 (改 4 skill 风险, 没拍板)
+- 不做 SpectrAI 抽离 (1-2 hr 大项目, 没拍板)
+- 不做 AgentMemory benchmark (价值低)
+
 ### 4 报告互验 (V 6/4 反思 SOP 落地)
 
 | 报告 | 焦点 | V 端判断 |
@@ -1305,7 +1327,7 @@ pytest tests/ --continue-on-collection-errors --tb=no -q | tail -5
 **报告声明 vs V 端 verify**：
 - ✅ "9-skill 全部 alive" → 11/11 复 verify 真
 - ❌ "systemd 守护 ✅" → 14:18 失效 (永久 SOP 第 8 件)
-- ❌ "VCPToolBoxAdapter 已注册" → 死代码 (grep 无引用)
+- ❌ "VCPToolBoxAdapter 已注册" → **14:32 修正: 整个文件 V 12:10 幻觉, VCP 源 0 引用** (永久 SOP 第 9 件: 报告"已修复"必 grep 真验证)
 
 ### 9-skill 11/11 复 verify (14:18)
 
@@ -1339,7 +1361,7 @@ pytest tests/ --continue-on-collection-errors --tb=no -q | tail -5
 1. ✅ **watchdog 常驻守护** (已完成 14:23, 待 deploy)
 2. AgentSearch 4 skill util 化 (V 30 min)
 3. SpectrAI 真源文件抽离 (V 1-2 hr)
-4. VCPToolBoxAdapter 死代码处理 (V 5 min, 等浮光拍板)
+4. ~~VCPToolBoxAdapter 死代码处理 (V 5 min, 等浮光拍板)~~ ❌ 14:32 修正: 不存在, V 端不处理
 5. AgentMemory 性能 benchmark (V 30 min)
 
 ### V 端不能做 (需浮光拍板大项目)
@@ -1359,7 +1381,7 @@ pytest tests/ --continue-on-collection-errors --tb=no -q | tail -5
 2. SpectrAI 仓处理 (等上游 / 抽 WorkflowGenerator.ts / 用 out/)?
 3. NexusAI 整体推进?
 4. AgentMemory L2/L3/L4 Rust 化?
-5. VCPToolBoxAdapter 注册 / 删?
+5. ~~VCPToolBoxAdapter 注册 / 删?~~ ❌ 14:32 修正: 不存在
 6. 5 仓 ahead 推远端 (AgentMemory 3 / AgentSymphony 2 / AgentSearch 5 / superthinking 5)?
 
 ### 浮光 deploy 命令 (1 行)
