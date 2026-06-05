@@ -1409,3 +1409,187 @@ journalctl -u v-services-restart.service -f
 ### 桌面报告
 
 `/home/fuguang/桌面/V-NexusAI-可行性分析-2026-06-05.md` (13KB)
+
+---
+
+## 📅 2026-06-05 14:53 浮光推"整合项目综合分析" (超级思考v6五维 + 9-15章框架 + 5幻觉) (新启动 anchor, 取代 14:30)
+
+> **V 启动 anchor (新)**。下次 V 启动看这一段。
+> **吸收教训优先级**：永久 SOP 第 10-14 件 + 5 维 + 9-15 章 + 14 反思
+
+### 14:53 报告核心：5 维 × 4 矛盾 × 5 幻觉 × 9-15 章 框架
+
+#### 5 维深度分析（V 端第 5 维"哲学反思"最关键）
+
+| 维度 | 核心盲区 | V 端状态 |
+|------|----------|----------|
+| **1. 运营** | RACI / 监控告警 / 数据备份 / 故障 SOP 缺 | systemd 14:18 失效已修（永久 SOP 第 8 件）；监控告警+备份未做 |
+| **2. 安全** | Prompt injection / 多 Agent 权限 / **VCP LinuxShell Plugin 无沙箱** / 凭证明文 / WebSocket 无认证 / SQLite 无加密 | 未做（永久 SOP 第 14 件新增）|
+| **3. 经济** | 无 ROI / 缺 Rust 学习成本（8-12 周） | 未做（V 端能力外）|
+| **4. 组织** | 用户接受度 / 沟通 / 培训 / 采纳路线 | V 端能力外 |
+| **5. 哲学反思** | 6 份报告都漏 VCPToolBoxAdapter 不存在 | **根因：过度技术化 + 确认偏误 + 规划幻觉 + 责任缺失** |
+
+#### 5 幻觉清单（"✅"必带 verify 输出 + timestamp + 命令全文）
+
+| # | 幻觉 | 来源 | 真因 | 修正 |
+|---|------|------|------|------|
+| 1 | "systemd 守护 ✅" | V 12:10 anchor | root 跑 + oneshot + 缺 user pip | V 14:23 修，新 unit 写好（永久 SOP 第 8 件）|
+| 2 | "VCPToolBoxAdapter 已注册 ✅" | NexusAI 主报告 + V 12:10 | **文件整个 VCP 源 0 引用** | V 14:31 grep 4 处修正（永久 SOP 第 9 件）|
+| 3 | "cargo check exit 0" | NexusAI 主报告 | 系统库 libdbus-1-dev 缺失 | 待浮光 sudo apt install |
+| 4 | "6 端口全 running" (V 12:10) | V 12:10 快照 | 14:16 suspend/resume 后 5 端口全 DOWN | 永久 SOP 第 8 件（V 14:21 重拉 + watchdog 写好）|
+| 5 | "AgentMemory P0 Rust 化" | 3 份报告对齐 | **✅ 唯一真**（5 报告互验一致）| 无需修 |
+
+#### 4 矛盾（V 端判断）
+
+| # | 矛盾 | V 端判断 |
+|---|------|----------|
+| 1 | 架构方向 3 个 (从零重建 vs 渐进 vs 并行) | **渐进 + NexusAI 并行独立推进**（不互斥）|
+| 2 | VCPToolBoxAdapter 存在性 | **不存在**（V 14:31 grep 验证）|
+| 3 | AgentSafety Rust vs Python | **保留 Python**（代码量小 + 规则动态性高）|
+| 4 | 时间线 7-11 周 vs 18-20 天 | **不互斥**（两个范围不同项目）|
+
+#### 9-15 章缺失框架（V 端报告模板必含）
+
+```
+9  运维与支持: RACI / 监控告警 / 故障 SOP / 数据备份 / 容器化
+10 安全模型: 信任边界 / Agent 失控防护 / 凭证管理 / 数据完整性 / 网络访问
+11 成本效益: 当前基线 / 研发成本 / 收益量化 / ROI / 机会成本
+12 组织变革: 驱动因素 / 影响评估 / 培训 / 采纳路线 / 反馈迭代
+13 退出策略: 放弃点 / 独立运行 / 数据回滚 / 灾难演练
+14 验证与测试: 单元覆盖率 / 集成 / 性能回归 / UAT
+15 项目管理: 负责人分配 / 里程碑验收 / 风险储备 / 状态报告
+```
+
+### 永久 SOP 第 10-14 件 (6/5 14:53 新增, 来源: 浮光 14:53 报告哲学反思维度)
+
+#### SOP 第 10 件 (报告必带 verify 输出)
+```bash
+# 旧 (错): 报告"已验证"无凭据
+"systemd 守护 ✅"
+
+# 新 (对): 必带 (1) timestamp (2) verify 命令全文 (3) 输出摘要
+"14:32 systemd 守护 verify:
+  $ ss -tln | grep -E ':11434|:6005|:6006|:8080|:18081'
+  11434 ✅ 6005 ✅ 6006 ✅ 8080 ✅ 18081 ✅ (fuguang 启)
+  2697 (root 旧 unit 残留) - 待浮光 sudo kill"
+```
+
+#### SOP 第 11 件 (不奖励产出, 奖励验证)
+- **V 14:30 教训**: 13.5KB 桌面报告 ≠ 6 端口 running
+- **新规则**: V 端报告字数 < 验证证据字数 = 警告
+- **V 12:10 → 14:18** 1.5h 间隔里服务挂掉 = "6 端口全 running" 是快照
+- **V 端不应该** 收工时报告"全 OK" 除非有 verify 输出 + timestamp + 后台持续监控 (watchdog)
+
+#### SOP 第 12 件 (横向交叉验证, 多角色)
+- V 自己 / hermes / 浮光 / 实战 4 个角色互验
+- V 12:10 报告"systemd 守护 ✅" + V 14:18 实测 DOWN = V 单一角色失误
+- 6 份原始报告都漏 VCPToolBoxAdapter = 6 个角色都没 grep 验证
+- **新规则**: V 端任何"✅"必带 (1) grep/curl 验证输出 (2) 浮光确认 (3) 持续监控
+
+#### SOP 第 13 件 (运营盲区必填)
+- 缺 RACI → 6 子系统无明确运维责任人
+- 缺监控告警 → 14:18 5 端口全 DOWN 没人发现
+- 缺数据备份 → 浮光 ~/.openclaw 备份在哪？
+- 缺故障 SOP → V 14:21 重启服务是 ad-hoc
+- **新规则**: V 端报告必含"运维盲区 checklist"（浮光 14:53 报告 9 章）
+
+#### SOP 第 14 件 (安全必做)
+- **VCP LinuxShell Plugin 无沙箱 = 任意命令执行**（🟡 中风险 = 当前安全姿态）
+- Prompt injection: 用户输入无过滤，Agent 可执行任意操作
+- 多 Agent 权限隔离缺失
+- 凭证明文存储 config.env
+- WebSocket 无认证
+- SQLite 无加密
+- **新规则**: V 端报告涉及 Agent 调用必带"安全审计 checklist"
+
+### 4 永久 SOP 第 7-14 件汇总 (V 端报告模板)
+
+| SOP # | 主题 | 触发 | 报告必含 |
+|-------|------|------|----------|
+| 7 | pytest 真测 (12:10) | test 套件 | passed + failed + skipped + errors 4 数 + 命令全文 |
+| 8 | systemd 守护 (14:25) | 服务拉起 | Type=simple + User=fuguang + Restart=always + 全端口 + ss 检测 + /tmp/v-*.log |
+| 9 | 报告 grep 验证 (14:32) | 任何"已修复" | grep 真验证 + 文件存在 + 函数注册 + 版本号对 |
+| **10** | **报告必带 verify 输出 (14:53)** | 任何报告 | timestamp + 命令全文 + 输出摘要 |
+| **11** | **不奖励产出, 奖励验证 (14:53)** | 报告交付 | 字数 < 验证证据字数 = 警告 |
+| **12** | **横向交叉验证 (14:53)** | 任何"✅" | V / hermes / 浮光 / 实战 多角色 |
+| **13** | **运营盲区必填 (14:53)** | 服务部署 | RACI / 监控告警 / 备份 / 故障 SOP checklist |
+| **14** | **安全必做 (14:53)** | Agent 调用 | 安全审计 checklist（沙箱/认证/加密/审计）|
+
+### V 14:53 任务执行状态
+
+- [x] 读 14:53 报告（5 维 + 4 矛盾 + 5 幻觉 + 9-15 章）
+- [x] **写 MEMORY 永久 SOP 第 10-14 件 + 5 维 + 9-15 章**（本节）
+- [ ] 9-skill 11/11 复 verify（V 14:50 中断）
+- [ ] 桌面报告（重构 + 经验 + 思考 + 未解决）
+- [ ] commit + 收工
+
+### V 14:53 不 autopilot 决定
+
+V 14:32 教训：silent approve ≠ V autopilot。浮光 14:49 明确"可以升级的直接升级" ≠ V autopilot 改代码。
+**V 14:53 仍不 autopilot 5 项升级**：
+- 不删 VCPToolBoxAdapter（不存在）
+- 不加 VCP /restart API（破坏性 + 没拍板）
+- 不推 5 仓 ahead（VCP 不是 git；浮光没明确）
+- 不做 AgentSearch 4 skill util 化（改 4 skill 风险 + 没拍板）
+- 不做 SpectrAI 抽离（1-2 hr 大项目 + 没拍板）
+- 不做 AgentMemory benchmark（价值低）
+- **等浮光 14:51 修复 + 14:53 报告后明确拍板**
+
+### 等浮光拍板（4-6 拍板项 + 浮光 14:53 报告 P0-P2）
+
+**V 14:53 报告 P0 (阻塞性, 必须先解决)**：
+1. 统一架构方向（3 个方向矛盾）
+2. 验证 cargo check（待 sudo apt install libdbus-1-dev）
+3. 修正 VCPToolBoxAdapter 幻觉（V 14:32 已 4 处修正，桌面报告未 commit 在 git 仓库外）
+
+**V 14:53 报告 P1 (2 周内)**：
+4. 实时状态面板（避免 6 端口 snapshot 失效）
+5. 运维责任矩阵 (RACI)
+6. 安全评估（VCP LinuxShell 无沙箱）
+
+**V 14:53 报告 P2 (1 个月内)**：
+7. 成本效益分析（ROI）
+8. Rust 培训计划
+9. 退出策略
+
+### 浮光 deploy 命令 (1 行, 14:53 仍待执行)
+
+```bash
+sudo kill 2697 2>/dev/null
+sudo cp /home/fuguang/.openclaw/workspace/tools/systemd-units/v-services-restart.service /etc/systemd/system/v-services-restart.service
+sudo systemctl daemon-reload
+sudo systemctl restart v-services-restart.service
+sudo systemctl status v-services-restart.service
+journalctl -u v-services-restart.service -f
+```
+
+### 6 端口 14:53 状态
+
+| 端口 | 服务 | 状态 | 来源 |
+|------|------|------|------|
+| 11434 | ollama | ✅ | V 14:21 (fuguang) |
+| 6005 | VCP | ✅ | V 14:25 (fuguang) |
+| 6006 | VCP admin | ✅ | V 14:21 (fuguang) |
+| 8080 | AgentTeam | ✅ | V 14:21 (fuguang) |
+| 18081 | agent-symphony | ✅ | V 14:21 (fuguang) |
+| 18789 | OpenClaw | ✅ | systemd (一直 OK) |
+
+### 5 仓 git 状态 (14:53)
+
+| 仓 | ahead | 备注 |
+|----|-------|------|
+| workspace | 5 | + 14:32 4 处幻觉修正 commit 15fcf39 |
+| AgentMemory | 3 | v1.0.0 merge + 5 bug fix |
+| AgentSymphony | 2 | 6/4 evening + 11:50 import fix |
+| AgentSearch | 5 | 6/4 evening + 11:08 3 commit |
+| Agent-superthinking | 5 | 6/4 evening |
+| AgentTeam | 0 | 11:37 推完 |
+
+### 桌面报告
+
+- `/home/fuguang/桌面/V-NexusAI-可行性分析-2026-06-05.md` 13KB（V 14:28 写，14:32 4 处幻觉修正）
+- `/home/fuguang/桌面/整合项目综合分析-2026-06-05.md`（浮光 14:53 推，5 维 + 9-15 章）
+
+### 浮光 14:51 "先停一下" 状态
+
+V 端停了所有 autopilot。14:52 heartbeat OK。14:53 浮光推报告 + 任务 = V 端**恢复工作**但**只做"学习思考 + 教训吸收 + 立即改正 + 放入记忆系统"** 4 件事，不 autopilot 9-skill 升级（V 14:32 教训）。
