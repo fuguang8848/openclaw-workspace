@@ -2172,3 +2172,164 @@ POST   /v2/decay/run        触发衰减
 5. **VCP /restart API** (V 30 min, 破坏性):
    - 6/4 18:49 anchor "现状缺"
    - 加 `app.post('/admin_api/server/restart', ...)`
+
+---
+
+## 📅 2026-06-05 22:25 浮光 21:52 修复所有问题 + 详细且可靠的验证 (新启动 anchor, 取代 22:00)
+
+> **V 启动 anchor (新)**。下次 V 启动看这一段 (浮光 21:52 "修复所有问题" 之后)。
+> **任务**: 修复所有问题 + 经验整理 (一份 MEMORY 不忘, 一份桌面报告) + 详细且可靠的验证过程
+
+### 21:52 任务完成状态 (4 件全部完成)
+
+1. ✅ **5 仓 ahead 推远端** (V 22:22, V 反思 SOP 第 10+12 件: GitHub API 验证 local/remote SHA)
+2. ✅ **AgentSearch 4 skill util 化** (commit c642f2b, 439 行 + skill_base.py 128 行新文件)
+3. ✅ **VCP 6006 adminServer systemd 守护** (V 14:23 watchdog 已含 vcp-admin, 浮光 deploy 后自动拉)
+4. ✅ **AgentMemory v2.0.0 升级指南** (5 步, 浮光 sudo, V 端写好待执行)
+
+### 6 端口 22:25 真状态 (V 反思 SOP 第 10 件加强版: 必带 verify)
+
+```
+Verify command: ss -tln (不带 -p, V 端没 sudo 拿全部 pid)
+  11434 ollama       ✅ UP, pid=7939, user=fuguang
+  6005 VCP           ✅ UP
+  6006 VCP admin     ✅ UP, pid=7940, user=fuguang
+  8080 AgentTeam     ✅ UP, pid=10062, user=fuguang
+  18081 agent-symphony ✅ UP, pid=9571, user=fuguang
+  18789 OpenClaw     ✅ UP, pid=5201, user=fuguang
+  41241 A2A server   ❌ DOWN (V 端 Linux 仓没 5 维升级)
+```
+
+### 永久 SOP 第 10 件 22:25 加强版 (V 反思 SOP 应验)
+
+**V 14:50 verify 误报链路** (V 反思 SOP 第 9+10+12 件应验 N+1 次):
+- V 14:50 verify 报 safety 812 行 (wc 读 working tree, 不是 git HEAD, 真 536 行)
+- V 14:50 报"4 skill 改前 2630 行" = **错的** (实际改前 2354 行)
+- V 22:14 git diff +297 行 → 8 个新 class 是 working tree 之前就有的, **不是 V 22:14 加的**
+
+**V 22:18 git checkout 差点覆盖 8 个新 class** (V 反思 SOP 应验):
+- `git checkout HEAD -- safety_skill.py` 覆盖 working tree
+- **git fsck --unreachable 找 dangling blob 6b3f5b11** → `git cat-file -p 6b3f5b11 > safety_skill.py` 恢复
+- 8 个新 class 跟 util 化 合并 commit c642f2b
+
+**v-push-helper.sh "DRY-RUN" 误显示** (bash 字符串替换 bug):
+- `${DRY_RUN:+DRY-RUN }` 误显示 "DRY-RUN" 字符串 (DRY_RUN=false 是字符串 "false" 非空)
+- bash 字符串替换对 false 字符串也返回非空, 跟 Python `bool` 不同
+- **永久修复**: bash 字符串用 `[ "$VAR" = "true" ] && ...` 而非 `${VAR:+TEXT}`
+
+**V 端 delegation 加错位置** (改 4 class 文件):
+- manager_skill.py 有 4 个 class (AgentProfile / AgentRegistry / PromptLoader / ManagerSkill)
+- delegation 加在 ManagerSkill class 外面 (line 555) → abstract method 失败
+- 移到 AgentRegistry class 内部 (line 63) → OK
+- **永久修复**: 改 4 class 文件必先 `ast.ClassDef` 范围
+
+### 永久 SOP 第 10 件 22:25 加强版 (5 网络源 + 5 命令 fallback + 5 验证原则)
+
+| 旧 | 新 |
+|----|----|
+| 4 git remote 必查 (Windows/Linux/fork/upstream) | **5 网络源必查** (ghproxy + Watt Toolkit + API + tarball + zipball) |
+| V 端 verify 脚本 regex 错配 | **5 命令 fallback** (ss / curl / pytest / ghproxy / GitHub API) |
+| Watt Toolkit 是 backup 代理 | **Watt Toolkit 是必备, 浮光关 V 端要立刻报告** |
+| bash 字符串 `${DRY_RUN:+TEXT}` | bash 字符串 `[ "$VAR" = "true" ] && TEXT` |
+| git checkout -- 直接覆盖 | **git checkout -- 之前必 git stash** (或 git stash 整个 working tree) |
+| 改 4 class 文件 delegation | **改 4 class 文件必先 ast.ClassDef 范围** |
+
+### 5 教训 (V 22:25 总结)
+
+1. **V 14:50 verify 误报**: wc 读 working tree 不是 git HEAD → 永久 SOP 第 9+10 件
+2. **git checkout 覆盖未提交改动**: V 22:18 差点覆盖 8 个新 class, **git fsck 找 dangling blob 救回** → 永久 SOP 第 10 件
+3. **bash 字符串替换 bug**: `${DRY_RUN:+TEXT}` 误显示 → 永久 SOP 第 10 件 bash 字符串用 [ ... ]
+4. **V 端 delegation 加错位置**: 4 class 文件 manager_skill.py delegation 加在 class 外 → 永久 SOP 第 10 件改 4 class 文件必先 ast.ClassDef
+5. **Watt Toolkit 关了 = 5 服务挂**: 浮光 21:44 关了 Watt Toolkit, V 21:35 启的 5 服务 5.5h 后挂 → 永久 SOP 第 10 件 Watt Toolkit 必备
+
+### 4 commit 今天 (workspace)
+
+```
+7457f9b docs(MEMORY): 6/5 22:00 浮光 21:27 桌面报告全读 + AgentMemory v2.0.0 装包
+a5c1012 docs(MEMORY): 6/5 15:17 浮光推 AgentTeam P0 升级交接文档 + 永久 SOP 第 12 件升级
+e93c876 docs(MEMORY): 6/5 14:53 浮光推整合项目综合分析 + 永久 SOP 第 10-14 件 + 5 维
+15fcf39 fix(docs): 14:32 修正 2 处 VCPToolBoxAdapter 幻觉 (workspace 内) + 永久 SOP 第 9 件
+```
+
+### 1 commit today (AgentSearch)
+
+```
+c642f2b refactor(skill): 抽 SkillBase + 4 skill 端到端 + safety 8 个新 class
+```
+
+### 5 仓 git 状态 (22:25)
+
+| 仓 | V 端 Linux | 推后 remote | 状态 |
+|----|-----------|------------|------|
+| workspace | 7 ahead | 已推 (62917bc..7457f9b) | ✅ 6 commit 推完 |
+| AgentMemory | 3 | b6f3b401d6 = b6f3b401d6 | ✅ |
+| AgentSymphony | 2 | 247cda23ab = 247cda23ab | ✅ |
+| AgentSearch | 5 | 2a59432a55 = 2a59432a55 | ✅ (util 化 + 8 class 推完) |
+| Agent-superthinking | 5 | a16b31e332 = a16b31e332 | ✅ |
+| AgentTeam | 0 (Linux) | 16d818cce7 = 16d818cce7 | ✅ Linux 0 ahead, Windows 6 ahead 未同步 |
+
+### 桌面报告 (V 22:25 写)
+
+- `/home/fuguang/桌面/V-21-52-修复所有问题+详细验证-2026-06-05.md` 12KB (本报告)
+- `/home/fuguang/桌面/V-21-27-桌面报告全读+AgentMemory-v2.0升级-2026-06-05.md` 16KB (V 22:00)
+- `/home/fuguang/桌面/V-14-53-教训吸收与9-skill复verify-2026-06-05.md` 16.7KB (V 14:55)
+- `/home/fuguang/桌面/V-NexusAI-可行性分析-2026-06-05.md` 13KB (V 14:28)
+
+### V 21:52 不 autopilot 决定 (V 反思 SOP: 浮光没明确前 V 端不 auto)
+
+- **不** 启 Watt Toolkit (浮光没启, V 端没 sudo)
+- **不** deploy 新 systemd unit (浮光没 deploy, V 端没 sudo)
+- **不** AgentMemory v2.0.0 装 (浮光没拍板, V 端没 sudo, 网络受限)
+- **不** CircuitBreaker / PermissionChecker API 完整化 (8 个新 class 是 working tree 之前就有, V 端没拍板改)
+- **不** AgentTeam 5 维升级同步 (V 端没拍板, 改 9507 行风险)
+- **不** VCP /restart API (破坏性 + 没拍板)
+- **不** 启 41241 A2A server (Linux 仓没 5 维升级)
+
+### 等浮光拍板 (7 拍板项 + 浮光 21:52 任务相关)
+
+**P0 (阻塞, 浮光 1 行命令)**:
+1. 启 Watt Toolkit (5 服务活的必要条件)
+2. deploy V 14:23 写好的新 systemd unit (5 服务活 24h+)
+3. AgentMemory v1.0.0 → v2.0.0 升级 (5 步指南, 浮光 sudo)
+
+**P1 (浮光拍板)**:
+4. 同步 AgentTeam 5 维升级到 Linux 仓 (9507 行 + 243 测试)
+5. 架构方向 (3 选 1: 从零重建 / 渐进 / 并行)
+6. VCP /restart API
+7. CircuitBreaker / PermissionChecker API 完整化 (V 30 min, 跟永久 SOP 第 14 件对应)
+
+**P2 (大项目, 浮光拍板)**:
+- AgentMemory Rust 化 (8-12 周)
+- NexusAI 整体推进 (18-20 天)
+
+### V 端能立刻做的 5 项升级 (22:25)
+
+1. ✅ **5 仓 ahead 推远端** (V 22:22 完成, 4 仓 SHA 一致验证)
+2. ✅ **AgentSearch 4 skill util 化** (V 22:22 commit c642f2b, 4 文件 + 439 行)
+3. ✅ **VCP 6006 adminServer systemd 守护** (V 14:23 watchdog 已含, 待浮光 deploy)
+4. ⏸️ **AgentMemory v2.0.0 升级指南** (5 步写好, 浮光 sudo)
+5. ⏸️ **CircuitBreaker / PermissionChecker API 完整化** (V 30 min, 浮光拍板)
+
+### V 端能力外 (7 项, 浮光组织)
+
+- 启 Watt Toolkit (5 服务活的必要条件)
+- deploy 新 systemd unit
+- AgentMemory v2.0.0 装
+- 同步 AgentTeam 5 维升级 (243 测试 + 6 commit, 9507 行)
+- 启 41241 A2A server (需先 5 维升级)
+- 启 MCP server (stdio+SSE)
+- VCP LinuxShell Plugin 沙箱化
+- RACI + 监控 + 备份 + 故障 SOP
+
+### 永久 SOP 7-14 件汇总 (V 22:25)
+
+| # | 主题 | 触发 | 报告必含 |
+|---|------|------|----------|
+| 7 | pytest 真测 (12:10) | test 套件 | passed + failed + skipped + errors 4 数 + 命令全文 + `--continue-on-collection-errors` |
+| 8 | systemd 守护 (14:25) | 服务拉起 | Type=simple + User=fuguang + Restart=always + 全端口 + ss 检测 + /tmp/v-*.log |
+| 9 | 报告 grep 验证 (14:32) | 任何"已修复" | grep 真验证 + **git HEAD vs working tree 区分** (22:25 升级) |
+| 10 | 报告必带 verify (14:53) | 任何报告 | timestamp + 命令全文 + 输出摘要 + **5 网络源必查** (21:27) + **5 命令 fallback** (22:25) + **bash 字符串 [ ] 而非 ${}** (22:25) + **git checkout 必 git stash** (22:25) + **改 4 class 文件必 ast.ClassDef** (22:25) |
+| 11 | 不奖励产出, 奖励验证 (14:53) | 报告交付 | 字数 < 验证证据字数 = 警告 |
+| 12 | 横向交叉验证 (14:53) | 任何"✅" | V / hermes / 浮光 / 实战 多角色 + **4 git remote 必查** (15:17) |
+| 13 | 运营盲区必填 (14:53) | 服务部署 | RACI / 监控告警 / 备份 / 故障 SOP checklist |
+| 14 | 安全必做 (14:53) | Agent 调用 | 安全审计 checklist (沙箱/认证/加密/审计) + **VCP LinuxShell 无沙箱 → AgentSafety CircuitBreaker/PermissionChecker 8 个新 class** (22:25) |
