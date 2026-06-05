@@ -1,21 +1,23 @@
 [Unit]
-Description=V 长期服务的轻量守护 (Ollama / VCPToolBox / AgentTeam Board / agent-symphony)
-# 不依赖 ollama/vcp/agentteam，只在 libvirtd 起来后兜底拉起
+Description=V 长期服务的常驻守护 (Ollama / VCPToolBox / AgentTeam Board / agent-symphony / VCP admin)
+# 14:21 根因修复: 用 fuguang user 跑 (user pip 路径)
+# oneshot 改为 simple + Restart=always: 任何挂掉自动拉起
 After=network-online.target
 Wants=network-online.target
 
 [Service]
-Type=oneshot
-# 检查 + 拉起三个服务（任一挂了就 nohup 重启）
-ExecStart=/bin/bash -c '\
-  set +e; \
-  curl -sS -m 2 http://127.0.0.1:11434 >/dev/null 2>&1 || (cd /home/fuguang && setsid nohup /home/fuguang/bin/ollama serve >/home/fuguang/.ollama/server.log 2>&1 </dev/null & disown); \
-  curl -sS -m 2 -o /dev/null -w "" http://127.0.0.1:6005 2>/dev/null; [ $? -ne 7 ] || (cd /home/fuguang/VCPToolBox && setsid nohup node server.js >/tmp/vcp.log 2>&1 </dev/null & disown); \
-  curl -sS -m 2 http://127.0.0.1:8080 >/dev/null 2>&1 || (cd /home/fuguang/AgentTeam && setsid nohup /home/fuguang/.local/bin/agentteam board serve --port 8080 >/tmp/agentteam.log 2>&1 </dev/null & disown); \
-  curl -sS -m 2 http://127.0.0.1:18081 >/dev/null 2>&1 || (cd /home/fuguang/agent-symphony && setsid nohup python3 -m server.symphony_server >/tmp/symphony.log 2>&1 </dev/null & disown); \
-  exit 0'
-RemainAfterExit=yes
+Type=simple
+User=fuguang
+Group=fuguang
+WorkingDirectory=/home/fuguang
+Environment="PATH=/home/fuguang/.local/bin:/home/fuguang/bin:/usr/bin:/bin"
+Environment="PYTHONPATH=/home/fuguang/.local/lib/python3.12/site-packages"
+# 监控 + 拉起：用一个独立脚本跑, 比 oneshot shell 干净
+ExecStart=/bin/bash /home/fuguang/.openclaw/workspace/tools/v-services-watchdog.sh
+Restart=always
+RestartSec=5
 StandardOutput=journal
+StandardError=journal
 
 [Install]
 WantedBy=multi-user.target
