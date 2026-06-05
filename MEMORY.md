@@ -1247,3 +1247,143 @@ pytest tests/ --continue-on-collection-errors --tb=no -q | tail -5
 ### 桌面报告
 
 `/home/fuguang/桌面/V-9-skill升级-2026-06-05.md` (11.7KB)
+
+---
+
+## 📅 2026-06-05 14:30 4 报告 + 9-skill 升级 + systemd 修复 (收工 anchor, 取代 6/5 12:10)
+
+> **V 启动 anchor (新)**。下次 V 启动看这一段。
+
+### 14:18 5 端口全 DOWN 根因 (V 反思 SOP 第 8 件)
+
+**12:53 收工时 6 端口全 ✅ → 14:18 全 DOWN**（1.5h 间隔）
+
+**根因链**：
+1. **14:16:09 机器 suspend/resume** (kernel "Low-power S0 idle")
+2. **14:16:16 systemd v-services-restart.service 自动跑** (oneshot, 一次性)
+3. **root 跑 (uid=0) → 缺 user pip 路径** → agentteam/fastapi ModuleNotFoundError
+4. **oneshot 跑一次就完 → 14:18 5 端口全 DOWN** (OpenClaw 18789 还在)
+
+**14:18 V 端"systemd 守护 ✅"是误判** (V 6/4 反思 SOP 第 N 次):
+- 12:10 报告"v-services-restart.service enable ✅"
+- 实际**只对 binary 服务有效** (ollama, node)
+- **对 venv Python 服务无效** (agentteam, agent-symphony) — root 缺 user pip
+
+### 14:21-14:25 V 端修复
+
+| 修复 | 文件 | 状态 |
+|------|------|------|
+| 手动启 5 服务 (fuguang uid) | 5 setsid nohup | ✅ 14:21 |
+| 写 watchdog 脚本 | `tools/v-services-watchdog.sh` 1490B | ✅ 14:23 |
+| 重写 systemd unit (User=fuguang + Restart=always) | `tools/systemd-units/v-services-restart.service` 713B | ✅ 14:23 |
+| 桌面报告 (可行性分析 + 9-skill) | `/home/fuguang/桌面/V-NexusAI-可行性分析-2026-06-05.md` 13KB | ✅ 14:28 |
+
+### 永久 SOP 第 8 件 (6/5 14:25 systemd 守护)
+
+| 旧（错）| 新（对）|
+|---------|---------|
+| Type=oneshot | Type=simple + Restart=always + RestartSec=5 |
+| 跑 root | User=fuguang Group=fuguang |
+| 不用 PYTHONPATH | Environment="PYTHONPATH=/home/fuguang/.local/lib/python3.12/site-packages" |
+| 仅 4 端口 | 含 5 端口 (含 adminServer 6006) |
+| curl -m 2 检测 | ss -tln 检测 (启动慢误判) |
+| /tmp/*.log (root 写) | /tmp/v-*.log (fuguang 写) |
+
+### 4 报告互验 (V 6/4 反思 SOP 落地)
+
+| 报告 | 焦点 | V 端判断 |
+|------|------|----------|
+| 现状普查 | 6 子系统状态 | 5/6 服务 (V 14:21 全 5) |
+| 融合架构分析 | 4 skill Rust 重写 | AgentMemory P0 ✅, AgentSafety **不推荐** Rust |
+| Rust 融合方案 | 3 service 整合 | Rust RPC Gateway + 部分 Rust 化 |
+| NexusAI 完整实验 | 全新统一平台 | Tauri + Rust + 9 子系统适配, **cargo check 阻塞** (需 sudo apt install libdbus-1-dev) |
+
+**矛盾点**：
+- AgentSafety 走 Rust vs Python: V 选**保留 Python** (代码量小 + 规则动态性高)
+- 服务架构: V 选**渐进式集成 + NexusAI 并行独立推进** (不互斥)
+
+**报告声明 vs V 端 verify**：
+- ✅ "9-skill 全部 alive" → 11/11 复 verify 真
+- ❌ "systemd 守护 ✅" → 14:18 失效 (永久 SOP 第 8 件)
+- ❌ "VCPToolBoxAdapter 已注册" → 死代码 (grep 无引用)
+
+### 9-skill 11/11 复 verify (14:18)
+
+```
+1. agentsearch         ✅ 10/10 smoke
+2. AgentSafety         ✅ 100 次 0.0ms
+3. AgentSupervisor     ✅ create_task OK (队列无持久化=hermes痛点)
+4. AgentManager        ✅ init OK
+5. TeamSkill           ✅ init OK
+6. agentmemory v1.0.0  ✅ 4 层 OK, L3 vector 201 条
+7. AgentSymphony       ✅ 9/10 test_integration
+8. superthinking v6    ✅ 18/18
+9. VCP                 ✅ 6005 RUNNING
+10. VCP admin          ✅ 6006 RUNNING
+11. v-research-team    ✅ 4 步编排
+```
+
+### 14:25 6 端口状态 (V 手动启, fuguang uid)
+
+| 端口 | 服务 | 状态 | 来源 |
+|------|------|------|------|
+| 11434 | ollama | ✅ | V 14:21 (fuguang) |
+| 6005 | VCP | ✅ | V 14:25 (fuguang) — 14:16 systemd 启的 root 2698 自挂 |
+| 6006 | VCP admin | ✅ | V 14:21 (fuguang) |
+| 8080 | AgentTeam | ✅ | V 14:21 (fuguang) |
+| 18081 | agent-symphony | ✅ | V 14:21 (fuguang) |
+| 18789 | OpenClaw | ✅ | systemd (18789 一直 OK) |
+
+### V 端能立刻做的升级 (5 项)
+
+1. ✅ **watchdog 常驻守护** (已完成 14:23, 待 deploy)
+2. AgentSearch 4 skill util 化 (V 30 min)
+3. SpectrAI 真源文件抽离 (V 1-2 hr)
+4. VCPToolBoxAdapter 死代码处理 (V 5 min, 等浮光拍板)
+5. AgentMemory 性能 benchmark (V 30 min)
+
+### V 端不能做 (需浮光拍板大项目)
+
+| 项目 | 工作量 |
+|------|--------|
+| AgentMemory L2/L3/L4 Rust 化 | 8-12 人周 |
+| AgentSupervisor 队列持久化 (Rust) | 2-3 人周 |
+| AgentTeam Board Server Rust 重写 | 2-3 人周 |
+| NexusAI 18-20 天整体 | 18-20 天 |
+| PyO3 FFI 绑定 | 1-2 人周 |
+| Rust RPC Gateway | 1-2 人周 |
+
+### 6 拍板项 (浮光决定)
+
+1. VCP /restart API 加不加?
+2. SpectrAI 仓处理 (等上游 / 抽 WorkflowGenerator.ts / 用 out/)?
+3. NexusAI 整体推进?
+4. AgentMemory L2/L3/L4 Rust 化?
+5. VCPToolBoxAdapter 注册 / 删?
+6. 5 仓 ahead 推远端 (AgentMemory 3 / AgentSymphony 2 / AgentSearch 5 / superthinking 5)?
+
+### 浮光 deploy 命令 (1 行)
+
+```bash
+sudo kill 2697 2>/dev/null
+sudo cp /home/fuguang/.openclaw/workspace/tools/systemd-units/v-services-restart.service /etc/systemd/system/v-services-restart.service
+sudo systemctl daemon-reload
+sudo systemctl restart v-services-restart.service
+sudo systemctl status v-services-restart.service
+journalctl -u v-services-restart.service -f
+```
+
+### 5 仓 git 状态 (14:25)
+
+| 仓 | ahead | 备注 |
+|----|-------|------|
+| workspace | 4 | 6/5 12:10 + 12:53 + 14:25 (3 commit) |
+| AgentMemory | 3 | v1.0.0 merge + 5 bug fix |
+| AgentSymphony | 2 | 6/4 evening + 11:50 import fix |
+| AgentSearch | 5 | 6/4 evening + 11:08 3 commit |
+| Agent-superthinking | 5 | 6/4 evening |
+| AgentTeam | 0 | 11:37 推完 |
+
+### 桌面报告
+
+`/home/fuguang/桌面/V-NexusAI-可行性分析-2026-06-05.md` (13KB)
