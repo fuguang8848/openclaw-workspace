@@ -1,19 +1,24 @@
 {
-  "lastDayCheck": "2026-06-04T09:00:00+08:00",
+  "lastDayCheck": "2026-06-07T09:00:00+08:00",
   "lastWeekCheck": "2026-06-01T12:59:00+08:00",
-  "lastErrorCount": 1,
+  "lastErrorCount": 0,
   "lastChecks": {
     "email": 1745669640,
     "dream": 1745669580,
     "brief": 1780534913,
-    "heartbeat": 1780534913,
-    "memory_review": 1751275440,
+    "heartbeat": 1780707600,
+    "memory_review": 1780707600,
+    "memory_review_2026-06-07": 1780707600,
     "system_recovery": 1751275140
   },
   "notes": {
     "system": "Ollama & Gateway 每周一检查 - 2026-06-01",
     "ollama_models": "deepseek-r1:70b-q4-4k(42.5GB), deepseek-r1:70b-q4(42.5GB), qwen2.5-7b-q4(4.7GB), llama3.2:1b(1.3GB)",
     "2026-05-31_summary": "DeepSeek R1 70B Q4 GPU运行成功(3.3-10 tokens/s)，ROCm 7.2.4安装成功，VCPToolBox已修复API_URL",
-    "2026-06-03_review": "无新人工任务，4 agent仓全同步，Self-Drive cron每5min绿。"
+    "2026-06-03_review": "无新人工任务，4 agent仓全同步，Self-Drive cron每5min绿。",
+    "2026-06-04_review": "10h12m 巨日，24+8 commit 跨 5 仓，0 uncommitted (workspace)，3 决策等浮光跑 (B enable service / C AgentSearch 11 uncommitted / A push helper)。",
+    "2026-06-05_morning_cron": "memory review 触发, 模板 '晚上了' 误为 morning 10:47, 已记录。服务 4/5 挂过夜, 浮光回来一并拉起。",
+    "2026-06-06_evening_cron": "周六 23:00 静默心跳。浮光无活动。MEMORY.md 已 108KB (6/3 SOP 阈值 50K × 2.16)。6/5 22:25 anchor 仍有效, 7 拍板项等浮光。",
+    "2026-06-07_morning_cron": "周日 09:00 通用模板早安, 内部处理未 push。6/7 06:50-08:55 浮光 5 任务已落 (16KB 日志 + 桌面报告 16055B), 8 拍板项 + 11 SOP 升级待浮光。"
   }
 }

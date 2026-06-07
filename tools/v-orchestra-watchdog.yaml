@@ -1,0 +1,108 @@
+# V-Orchestra Watchdog 配置
+# 用途: 端口/服务监控 + Python 模块健康检查
+# 改这里就能改监控目标, 无需改代码
+# 路径: 全部相对于本机 $HOME (用 ${HOME} 占位)
+# 启动: /usr/bin/python3 /home/fuguang/.openclaw/workspace/tools/v-orchestra-watchdog.py
+
+meta:
+  version: "2.1.0"
+  owner: "V (浮光的 AI 助理)"
+  description: "交响乐技能家族持续监控 + AgentMemory extensions 健康检查"
+  last_updated: "2026-06-06"
+
+# 路径模板 (用 ${HOME} 占位, 运行时会展开)
+paths:
+  python_executable: "/usr/bin/python3"
+  log_file: "/tmp/v-orchestra-watchdog.log"
+  lessons_file: "${HOME}/桌面/v-orchestra-watchdog-经验记录.md"
+  agentmemory_src: "${HOME}/AgentMemory-upgrade/src"
+
+# 端口服务列表 — 加端口只需在这里加一行
+services:
+  - name: "Ollama"
+    host: "127.0.0.1"
+    port: 11434
+    health_cmd: "curl -s http://127.0.0.1:11434/api/tags"
+    accept_warnings: []
+  - name: "VCP"
+    host: "127.0.0.1"
+    port: 6005
+    health_cmd: "curl -s http://127.0.0.1:6005/health"
+    accept_warnings:
+      - "Unauthorized"   # 端口通但需 token, 视为 WARN 非 DOWN
+  - name: "VCP-Admin"
+    host: "127.0.0.1"
+    port: 6006
+    health_cmd: "curl -s http://127.0.0.1:6006/health"
+    accept_warnings:
+      - "Redirecting"
+      - "Found"
+  - name: "AgentTeam"
+    host: "127.0.0.1"
+    port: 8080
+    health_cmd: "curl -s http://127.0.0.1:8080/"
+    accept_warnings:
+      - "<!DOCTYPE"      # 返回 HTML 首页, 端口活就行
+  - name: "AgentSymphony"
+    host: "127.0.0.1"
+    port: 18081
+    health_cmd: "curl -s http://127.0.0.1:18081/health"
+    accept_warnings: []
+
+# Python 模块健康检查 — 加模块只需在这里加一项
+python_modules:
+  - name: "超级思考"
+    # Jury 实例化 + 跑 think, 验证模块能 import + 基础功能
+    test: |
+      from super_thinking.core.jury import Jury
+      j = Jury()
+      r = j.think("测试")
+      ok = r.successful >= 1
+      assert ok, f"successful={r.successful}"
+  - name: "agentmemory"
+    test: |
+      import agentmemory
+      from agentmemory import Memory
+      assert hasattr(agentmemory, "PIIRedactor")
+  - name: "agentmemory_extensions"
+    # 远端 YintaTriss/AgentMemory v2.0.1 移植层
+    test: |
+      from agentmemory.extensions.api import load_yinta_modules
+      result = load_yinta_modules(eager=True)
+      ok = sum(1 for v in result.values() if v == "OK")
+      assert ok >= 20, f"extensions OK={ok}, 预期 >= 20"
+  - name: "agent_safety"
+    test: |
+      from agent_safety import SafetyEngine, SafetyAction, ActionType
+      e = SafetyEngine()
+      a = SafetyAction(action_id="t", action_type=ActionType.SHELL_EXECUTE,
+                       agent_id="t", tool_name="rm", details={}, target="/")
+      r = e.evaluate(a)
+      decision = str(r.decision).lower() if r.decision else ""
+      assert "block" in decision, f"rm / 应被 block, 实际 {r.decision}"
+  - name: "agent_supervisor"
+    test: |
+      from agent_supervisor import SupervisorSkill
+      s = SupervisorSkill()
+      wf = s.create_workflow("t", [{"id":"s1","name":"s1","task_fn":lambda:"OK","deps":[]}])
+      assert wf
+  - name: "agent_manager"
+    test: |
+      from agent_manager import ManagerSkill
+      m = ManagerSkill()
+      r = m.execute("register", {"alias":"watchdog","name":"W","role":"monitor","description":"x"})
+      assert r.get("success")
+  - name: "agent_search"
+    test: |
+      from agent_search import SearchSkill
+      assert SearchSkill is not None
+
+# 进程检查 — pgrep 关键词
+processes:
+  - name: "OpenClaw"
+    pgrep_pattern: "openclaw"
+
+# 通知 (可选, 留空则不通知)
+notifications:
+  enabled: false
+  # 可选: 桌面通知 / 钉钉 webhook / 邮件
