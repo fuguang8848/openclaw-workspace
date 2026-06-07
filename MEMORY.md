@@ -947,6 +947,7 @@ Verify command: ss -tln
 10. **git checkout 前必 git stash** (SOP #10 22:25) — 防 working tree 误覆盖
 11. **改 4 class 文件必 ast.ClassDef** (SOP #10 22:25) — V 22:14 漏 safety class 8 个教训
 12. **改完立刻 commit, 不留尾巴** (SOP #16, V 6/7 09:20 升级完整版) — 漏 commit 教训 2 次应验 (6/4 22:14 + 6/7 09:00). 3 秒测试: git status 干净? checkout 还原不了? commit msg 写好? 任一"否"立即 commit.
+13. **收工必跑逆推** (SOP #20, V 6/7 10:00 升级) — 5 步 (列任务/找漏/找错/找学/改部署) + 3 轮 (V/浮光/实战视角). 不跑 = 任务不算完成 (跟 SOP #16 不 commit 同级). 实战: 8 任务 3 轮跑 1 漏 (skill.py M 4.5h) 立即修.
 
 ## 交响乐技能家族（2026-06-05）
 
