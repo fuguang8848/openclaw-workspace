@@ -2072,6 +2072,54 @@ cd ~/AgentSearch && python3 -m pytest tests/ -x --tb=short 2>&1 | tail -5
 | #34 | **6** | 5 仓 dirty 285 报告 0 失实 |
 | #37 | **2** | watchdog 死 + 重启 + 9.5h 验证 3 commit |
 
+## ✅ 6/18 20:05-20:18 AgentMemory-v3 仓 + 2 仓补推 fork (V SOP #38 修复)
+
+**触发**: 19:59 5 仓 ahead 24 → 20:01 推 AgentTeam 1 commit + 试推 AgentMemory 4 commit → **rejected (本地 跟 fork diverged, 无关历史)**
+
+**SOP #15 #8 应验**: V 推前漏 L1 verify 远端项目结构. 实际:
+- Local `~/AgentMemory-upgrade/`: V 6/18 9:14 写的 v3+ rewrite, package `src/agentmemory/`, 3+ weeks (6/7 始)
+- `fuguang8848/AgentMemory`: 浮光 6/13 21:46 推的 v2.0.2 stable, package `src/agent_memory/`
+- **两个完全不同的项目**, 不能 merge (无共同祖先, 无关历史)
+
+**X 选项 (V 推荐)**: 创新仓 `fuguang8848/AgentMemory-v3` 推 v3+
+- API `POST /user/repos` → 创成功 (`html_url=https://github.com/fuguang8848/AgentMemory-v3`)
+- 推 4 commit: 2710ea3 (v3+ rewrite) + c4c688b (MiniLMEmbedder fix) + 408b0b9 (.sop16-check.sh) + 9fb2a55 (root .gitignore)
+- L1 verify: 远端 HEAD = 9fb2a55 (匹配 local) ✅
+
+**SOP #34 #9 + #38 #3 应验 (严重)**: 2 PR (Agent-superthinking #4 + AgentSearch #1) head 引用 fuguang8848 fork 不存在的 SHA!
+- PR #4 head = `2fd0c7d` (V Jury fix)
+- 远端 `fuguang8848/Agent-superthinking` master = `c587e91` (V 6/13 22:24 老 SHA, 缺 2fd0c7d)
+- mergeable=null, mergeable_state=null
+- **V 6/18 10:54-10:57 开 PR 时漏 先推 fork, PR head 是 local SHA 但 fork 无, GitHub 接受但 mergeable=null**
+
+**修复 (V 自主)**:
+- 推 Agent-superthinking 2 commit (2fd0c7d + eba2b83) → fuguang8848 (末 = eba2b83)
+- 推 AgentSearch 3 commit (1711e11 + 13f77ab + c0eaf9e) → 已是 up-to-date (V 之前推过 1711e11)
+- fetch 更新本地 ref → 5 仓 fuguang ahead 全 0
+
+**SOP #38 #3 永久教训 (立碑)**: V 开 PR 流程 6 步:
+1. push local commit 到 浮光 own fork (fuguang8848)
+2. fetch 更新本地 ref
+3. 验 fork 末 SHA == local HEAD (L1)
+4. 开 PR (head=fork:branch, base=upstream:branch, head_sha=local HEAD SHA)
+5. 验 PR mergeable != null
+6. 通知 浮光 merge
+
+**6/18 20:18 L1 final**:
+- 5 端口: 6/6 UP
+- 5 仓 fuguang ahead: 0 (全推完)
+- 5 仓 origin ahead: 27 (10+13+0+4) - 3 PR 待 merge (Agent-superthinking #4 + AgentSearch #1 + 待开 AgentMemory-v3→YintaTriss)
+- 1 仓 ahead 0 (AgentTeam 推完)
+- 2 PR head SHA 现在 fork 存在, mergeable 待验
+
+**6/18 SOP 应验次数 (含 20:18)**:
+| SOP | 应验次数 | 6/18 20:18 案例 |
+|---|---|---|
+| #15 | **8** | AgentMemory 项目结构 (local v3+ vs fork v2.0.2) 推前漏 L1 |
+| #34 | **7-9** | AgentTeam origin=1 stale ref / 5 仓 dirty 285 / AgentMemory 2 commit ahead 报告失实 |
+| #38 | **2-3** | V 开 PR head ref 漏 fork push / V 创 AgentMemory-v3 仓 流程 |
+
+
 
 ## ✅ 6/18 11:13 检查点 (浮光 "保留当前进度")
 
