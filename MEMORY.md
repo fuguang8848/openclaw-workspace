@@ -2302,6 +2302,46 @@ cd ~/AgentSearch && python3 -m pytest tests/ -x --tb=short 2>&1 | tail -5
 - `.gitignore` 应加 `*.backup` 跟 `*.bak-pre-*` 两套 pattern
 - 任何 v5→v6 升级 backup 都不该入 PR
 
+## ✅ 6/18 21:39 YintaTriss 写权边界 + Comment 提交
+
+**触发**: 21:39 浮光 发 PR #2 截图问 "merge在哪里，没找到"
+
+**L1 verify (SOP #15 #12 + SOP #38 #6 应验)**:
+- V PAT API merge AgentSearch #2 → **404 Not Found** (无 push 权拒绝访问 endpoint)
+- YintaTriss/AgentSearch permissions: `{'admin': False, 'maintain': False, 'push': False, 'triage': False, 'pull': True}`
+- 浮光 (fuguang8848) 在 YintaTriss 仓 只有 pull 权
+- UI merge 按钮 隐藏原因: 无 push 权
+
+**YintaTriss 写权边界 (SOP #38 #6 永久教训立碑)**:
+- V 可: 开 PR / 写 comment / close PR (PR close 权 低)
+- V 不可: merge PR / push / reopen PR (需 YintaTriss maintainer 写权)
+- 浮光 也 一样: 只能 fork + 开 PR, merge 需 YintaTriss maintainer
+
+**修复路径**:
+- 唯一 0 阻力路径: YintaTriss maintainer merge (他们才是仓 写权)
+- V 自主权: 写 comment 草稿 + 提交, @YintaTriss ping maintainer
+
+**V post 2 comment (SOP #38 流程升级)**:
+- AgentSearch #2 comment_id **4742520389** (@YintaTriss, 1-click merge request, 16 files, 5206+/22-)
+- Agent-superthinking #5 comment_id **4742520633** (@YintaTriss, 1-click merge request, 18 files, 2210+/16-)
+- L1 verify: 1 comment each (2/2 posted ✅)
+
+**6/18 21:39 L1 final**:
+- 5 端口 6/6 UP
+- 5 仓 fuguang ahead 0 (全推完)
+- 5 仓 origin ahead 27
+- 2 open PR (AgentSearch #2 + Agent-superthinking #5) — comment 提交 等 maintainer merge
+- 2 closed PR (AgentSearch #1 + Agent-superthinking #4)
+- watchdog PID 12227 systemd 24/7
+
+**6/18 SOP 应验 (含 21:39)**:
+| SOP | 应验 | 6/18 21:39 案例 |
+|---|---|---|
+| #15 | **12** | YintaTriss 写权 边界 L1 (404 + permissions) |
+| #34 | **13** | 5 仓 ahead 27 仍超 SOP #35 阈值 20 |
+| #38 | **6** | V 不可 merge (写权边界), comment 提交 (@YintaTriss) 代替 |
+
+
 
 
 
