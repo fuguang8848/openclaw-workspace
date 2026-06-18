@@ -1836,6 +1836,7 @@ cd ~/AgentSearch && python3 -m pytest tests/ -x --tb=short 2>&1 | tail -5
 | #35 | 5 仓 ahead 推 origin 节奏 | 6/15 ahead 50+ 积压 | 6/18 推 AgentTeam 20 + 3 commit |
 | #36 | 升级必带 test | 6/15 3 升级 demo 无 pytest | **6/18 10:14 AgentSearch 6 test** |
 | #37 | 5 仓 git activity 通知 | 6/15 21:14 16 分钟滞后 | 6/18 09:40 实装 + 9:52 首次实战 |
+| **#38** | **V 帮浮光 开 PR 流程** | **6/18 v-push-helper 静默失败 + gh CLI 未装** | **6/18 10:54 开 2 PR** |
 
 ## ✅ 6/18 4 紧急修复 + 6 SOP 立碑 (V 10:17 总收工)
 
@@ -1928,3 +1929,81 @@ cd ~/AgentSearch && python3 -m pytest tests/ -x --tb=short 2>&1 | tail -5
 - **Agent-superthinking Jury fix + 6 test 应验 SOP #36** — 6/18 10:30, 报告 5/5 P0/P1 失实中找出 1 真 bug 修了
 - **5 仓 ahead 累计 22 超 SOP #35 阈值 20** — Agent-superthinking 9 + AgentSearch 13 推 fuguang fork, YintaTriss 上游未动
 - **AI 超级大脑报告 5/5 P0/P1 失实** — V 不修 4 失实 (照修会修错), 已立碑 SOP #15 第 5 次
+
+## ✅ SOP #38 立碑 — V 帮浮光 开 PR 流程 (V 6/18 11:02)
+
+**触发**: 6/18 10:54 5 仓 ahead 累计 22 超 SOP #35 阈值 20, 浮光 拍板 "开 PR" (V 有 PAT 但 gh CLI 未装). V 6/18 10:54-10:57 走 GitHub API 开 2 PR.
+
+**背景**:
+- `gh` CLI 未装 (`/bin/bash: gh: 未找到命令`)
+- v-push-helper.sh 静默失败: 脚本 push `upstream` 关联的 remote (= `origin` = YintaTriss), 但 origin 无写权 + 没传 PAT, 输 "could not read Username" 但脚本说"完成"
+- **手动 push 需 ghproxy URL + PAT**: `git push https://x-access-token:${PAT}@ghproxy.net/...`
+
+**规则**:
+1. V 帮浮光 开 PR 走 GitHub REST API (curl + PAT), 不用 gh CLI
+2. 流程: push local → fuguang8848 fork → POST /repos/{upstream}/pulls (head=fuguang8848:branch, base=upstream:branch)
+3. PR title 格式: `[日期 sync] V 简述 + N commits from fuguang8848 fork`
+4. PR body 必含: L1 verify (SOP #28) + SOP 应验 (SOP #15/#32-#37) + L1 ahead 数字
+5. PR 后 5 端口 check 副作用 (SOP #28 永久)
+6. 5 仓 ahead 数字 L1 verify 区分: local..upstream (PR 待 merge 时仍 > 0), local..fuguang fork (push 后应 0)
+
+**6/18 10:54-10:57 实战**:
+| 仓 | commits | PR | URL |
+|---|---|---|---|
+| Agent-superthinking | 9 | #4 | https://github.com/YintaTriss/Agent-superthinking/pull/4 |
+| AgentSearch | 3 | #1 | https://github.com/YintaTriss/AgentSearch/pull/1 |
+
+**L1 verify (SOP #28)**:
+- 2 PR 状态: open ✅
+- 5 端口: 6005=401, 6006=302, 18081=404, 8080=200, 11434=200, 18789=200 全 UP
+- local HEAD == fuguang fork HEAD (推后同步)
+- upstream (YintaTriss) 仍 22 ahead (待 merge, PR 是非破坏性推送)
+- 推手 push: `git push https://x-access-token:${PAT}@ghproxy.net/https://github.com/fuguang8848/${repo}.git ${branch}`
+
+**PR body 模板** (跟 SOP #34 联动):
+```markdown
+## {日期} V 同步 (SOP #34 L1 verify)
+
+**来源**: fuguang8848/{repo} fork
+**L1 ahead 验证**: N commits ahead of YintaTriss/{branch}
+
+## Commits (从老到新)
+- {commit 1}: {title}
+- {commit 2}: {title}
+
+## L1 verify (SOP #28)
+- {test 1}: 6/6 pass
+- {test 2}: ...
+- 5 端口: {ports} 全 UP
+
+## SOP 应验
+- #15 N 次 (L1 不抄报告)
+- #32-#37 6 SOP 实战立碑
+- #36 升级必带 test (X/X pass)
+```
+
+**永久教训 (5)**:
+1. **v-push-helper.sh 静默失败 是 SOP #15 起源** — 推完输"完成"但实际没推, 需 L1 verify 远端 SHA == local HEAD
+2. **ghproxy URL + PAT 格式** — `https://x-access-token:${PAT}@ghproxy.net/https://github.com/...` (不是 `https://${PAT}@...`)
+3. **upstream 关联 ≠ push 目标** — 仓的 `upstream` 关联 `origin` (YintaTriss), 但 V 推 `fuguang` (own fork), 需 `git push $push_remote` 显式指定
+4. **PR 不影响 ahead 数字** — `git rev-list origin..HEAD` 在 PR merge 前仍 > 0, ahead 0 仅在 merge 后
+5. **PR body 必含 L1 verify 链** — 跟 SOP #34 联动, 浮光 review 时可查 L1 命令
+
+**V 自主权 vs 浮光 拍板**:
+| 操作 | V 自主 | 拍板 |
+|---|---|---|
+| L1 verify ahead | ✅ | — |
+| push fuguang8848 fork | ✅ | — |
+| 开 PR to YintaTriss | ⚠️ V 可开 (有 PAT) | 浮光 review + merge |
+| merge PR | ❌ 无权 | 浮光 merge (写权在 YintaTriss) |
+
+**6/18 L1 verify 全过**: 2 PR 开好, 浮光 merge 后 ahead → 0, SOP #35 阈值 20 触发解除
+
+**SOP 应验次数更新**:
+| SOP | 应验次数 | 6/18 案例 |
+|---|---|---|
+| #15 (报告 L1) | 5 | 报告失实 + PR body 必 L1 |
+| #28 (L1 端口) | N+2 | PR 前 + PR 后 2 次 5 端口 check |
+| #34 (V SOP 必 L1) | 4 | v-push-helper 静默失败 L1 发现 |
+| #35 (推 origin 节奏) | 2 | 累计 22 > 20, V 开 PR 解决 |
+| **#38 (V 开 PR 流程)** | **1** | **6/18 10:54-10:57 实战** |
