@@ -2007,3 +2007,45 @@ cd ~/AgentSearch && python3 -m pytest tests/ -x --tb=short 2>&1 | tail -5
 | #34 (V SOP 必 L1) | 4 | v-push-helper 静默失败 L1 发现 |
 | #35 (推 origin 节奏) | 2 | 累计 22 > 20, V 开 PR 解决 |
 | **#38 (V 开 PR 流程)** | **1** | **6/18 10:54-10:57 实战** |
+
+## ✅ 6/18 11:13 检查点 (浮光 "保留当前进度")
+
+**触发**: 浮光 11:13 "先保留当前进度，不要忘记" — SOP #29 (transcript 丢) 预防
+
+**保存状态**:
+- v-snapshot: `2026-06-18-111352-254.json` (5214 B, 11:08 / 11:03 / 11:13 = 3 snapshot)
+- git tag: `checkpoint-6-18-1113` (回滚保险)
+- workspace 14 commits today, 0 dirty, 0 untracked
+- 5 仓 HEAD: superthinking `2fd0c7d` / AgentSearch `c0eaf9e` / AgentTeam `45786f1` / AgentMemory-upgrade `c4c688b` / AgentSafety `906101f`
+- 5 端口 UP: 6005/6006/18081/8080/11434/18789 全 UP
+- watchdog PID 18177 稳定 (SOP #37)
+- 2 PR: Agent-superthinking #4 + AgentSearch #1 (待 浮光 merge)
+- 3 真 bug 修: log scale + Jury + MiniLMEmbedder
+- 18 test 6/6 pass (SOP #36)
+
+**6/18 14 commits workspace 完整 commit graph** (L1 验证存于 snapshot):
+1. 40f44d3 — 5 SOP 立碑 (#32-#35 #37)
+2. 6be2e50 — SOP #37 实装
+3. b34da43 — SOP #37 实施完成
+4. e165592 — 6/18 09:50 总结
+5. c5a7e77 — HEARTBEAT.md
+6. cc23d67 — SOP #36 立碑
+7. e598ce0 — 报告失实 L1 体系
+8. 2b41a9a — SOP #38 立碑
+9. 561721d — 12 dirty 清理
+10. 3f25cf7 — 6/18 11:11 完整日志
+
+**防失机制** (SOP #29 联动):
+- snapshot 文件 `.v-snapshot/` (3 份, 5214-5638 B)
+- git tag `checkpoint-6-18-1113` (workspace 仓库 3f25cf7)
+- 5 仓 commit 已推 fuguang8848 fork (3 仓) + 本地仓 (2 仓)
+- 27 sessions today snapshot 在 (active session 774551 B, 2026-06-18T11:13:52+08:00)
+- HEARTBEAT.md active, 每次 heartbeat 跑 SOP #28 L1 + SOP #37 activity
+
+**V 启动恢复流程** (SOP #29):
+- 看 snapshot `2026-06-18-111352-254.json` (latest)
+- 读 `next actions` + `last decisions`
+- 读 MEMORY.md 6/18 11:13 检查点 section
+- git checkout `checkpoint-6-18-1113` if needed
+- 读 6/18 完整日志 (memory/2026-06-18.md, 286 行)
+
