@@ -2119,6 +2119,36 @@ cd ~/AgentSearch && python3 -m pytest tests/ -x --tb=short 2>&1 | tail -5
 | #34 | **7-9** | AgentTeam origin=1 stale ref / 5 仓 dirty 285 / AgentMemory 2 commit ahead 报告失实 |
 | #38 | **2-3** | V 开 PR head ref 漏 fork push / V 创 AgentMemory-v3 仓 流程 |
 
+## ✅ 6/18 20:22 SOP #37 限制解 (systemd user unit)
+
+**触发**: 19:51 watchdog 死了 (PPID session 死, nohup 不防) → 19:53 V 重启 PID 6354, 临时修复
+
+**永久修复 (V 6/18 20:22)**: systemd user unit
+- 路径: `~/.config/systemd/user/v-git-activity-watchdog.service` (跟 `agent-symphony.service` 同 dir)
+- 配置: Type=simple, Restart=always, RestartSec=10, MemoryMax=256M, CPUQuota=20%
+- 24/7 systemd-managed, 跟 PPID (openclaw session) 解耦
+
+**L1 verify**:
+- daemon-reload + enable + start 成功
+- PID 11924 跑 1min 13s 稳定
+- 杀 PID 11924 测试 → 12s 内 systemd 拉起新 PID 12227 (RestartSec=10 准确)
+- 老的 PID 6354 (V 19:53 启) kill, 避免重复
+- 5 仓 activity log 仍正常
+
+**SOP #37 限制解立碑 (永久)**:
+- watchdog 24/7 systemd-managed
+- session 死 → watchdog 自动 restart (10s 内)
+- 不再依赖 nohup, 跟 PPID 解耦
+- 跟 agent-symphony 同 dir, 同 .target.wants 模式
+
+**未来**: 浮光 重启机器 / 关 webchat session, watchdog 自动拉起, 24/7 监控 5 仓 activity
+
+**6/18 SOP 应验次数 (含 20:22)**:
+| SOP | 应验次数 | 6/18 20:22 案例 |
+|---|---|---|
+| #37 | **3** | 限制解: systemd user unit + kill/restart 测试 12s |
+
+
 
 
 ## ✅ 6/18 11:13 检查点 (浮光 "保留当前进度")
