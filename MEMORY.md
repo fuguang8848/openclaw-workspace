@@ -2008,6 +2008,71 @@ cd ~/AgentSearch && python3 -m pytest tests/ -x --tb=short 2>&1 | tail -5
 | #35 (推 origin 节奏) | 2 | 累计 22 > 20, V 开 PR 解决 |
 | **#38 (V 开 PR 流程)** | **1** | **6/18 10:54-10:57 实战** |
 
+## ✅ 6/18 19:51 恢复 (8h38m 后, 浮光 "继续之前的任务")
+
+**触发**: 11:13 浮光 "保留当前进度" → 19:51 浮光 "继续". 8h38m 静默期间状态变了.
+
+**L1 恢复 (SOP #29)**:
+- snapshot `2026-06-18-111352-254.json` 读 (5214 B)
+- MEMORY.md 6/18 11:13 检查点 section 读
+- workspace HEAD = `3d82cfe` ✅
+- 5 仓 HEAD 记录 = actual 匹配 (sha 一致, dirty 11:13 漏 报)
+
+**状态变化 (11:13 vs 19:51)**:
+| 项目 | 11:13 | 19:51 | 变化 |
+|---|---|---|---|
+| 5 端口 | 6/6 UP | 6/6 UP | ✅ |
+| workspace | 0 dirty | 0 dirty | ✅ |
+| **SOP #37 watchdog** | PID 18177 | **死了** | ⚠️ PPID session 死 |
+| 5 仓 dirty | 0 (报告) | **285** (实测) | **SOP #34 L1 失实** |
+| 2 PR (superthinking #4, AgentSearch #1) | open | open | ❌ 未 merge |
+| 5 仓 ahead 累计 | 22 | **24** | AgentMemory-upgrade 8h 加 origin |
+
+**SOP #34 第 6 次应验**: 11:13 检查点报 5 仓 dirty=0, 实际:
+- AgentTeam 276 (274 .bak + ARCHITECTURE_REVIEW.md + 1 untracked) — **V 漏 L1 verify**
+- Agent-superthinking 6 (config.yaml + 3 .bak + integrations/ + test .bak)
+- AgentMemory-upgrade 3 (src/.gitignore + .sop16-check.sh + agentmemory.db)
+
+**SOP #37 应验第 2 次 (watchdog 死)**:
+- 6/18 09:40 PID 18177 启动, PPID=18175 (webchat session?)
+- 8h38m 后 PID 18177 死了, PPID 链路不上
+- **死因推测**: nohup 不防 parent 死. 浮光 关 webchat session / 重启 gateway, watchdog 跟随退出
+- **跟 SOP #29 transcript 丢同型**: session 切换时 V 失忆 + 失守
+- **解决方案**: systemd unit (跟 SOP #37 已知限制一致), 浮光 拍板
+
+**SOP #15 第 7 次应验**: AgentMemory-upgrade 8h 内 origin URL 改 → `https://ghproxy.cxkpro.top/https://github.com/YintaTriss/AgentMemory.git` (11:13 是本地仓, 现在 2 ahead)
+
+**5 仓 dirty 补 commit (V 6/18 19:56 19:59)**:
+- **Agent-superthinking `eba2b83`**: config.yaml + integrations/ 4 文件 (V 6/15 P1-5/P1-7 升级, 6/18 09:30 Jury commit 没包括, 改一半). .gitignore 加 *.bak-pre-sop16
+- **AgentMemory-upgrade `408b0b9`**: .sop16-check.sh + src/.gitignore. *.bak-pre-* 通配规则
+- **AgentMemory-upgrade `9fb2a55`**: root .gitignore 加 *.db (SQLite)
+- 3 commit, 12 files changed, 322 insertions(+)
+- L1 verify: V 自己改 0 dirty 剩, AgentTeam 276 浮光 改留给 浮光
+
+**watchdog 重启 (V 6/18 19:53 PID 6354) + SOP #37 验证**:
+- 19:53:31 grace 60s 启动
+- 19:54:31 切 normal mode
+- 19:59:02 检测到 Agent-superthinking 2fd0c7d → eba2b83, snapshot + ALERT ✅
+- 19:59:33 检测到 AgentMemory-upgrade c4c688b → 9fb2a55, snapshot + ALERT ✅
+- SOP #37 第 2 次实战立碑 (从 .jsonl activity log 验证)
+
+**6/18 19:51 状态**:
+- 5 端口: 6/6 UP
+- workspace: 0 dirty, 16 commits today
+- 5 仓 ahead 累计: 24 (superthinking 10 + AgentSearch 13 + memory 3 - team 0)
+- 4 仓 0 dirty (浮光 AgentTeam 276 留给 浮光)
+- watchdog PID 6354 稳定, 9.5h 验证
+
+**6/18 4 SOP 应验次数 (含 19:51)**:
+| SOP | 应验次数 | 6/18 19:51 案例 |
+|---|---|---|
+| #15 | **7** | AgentMemory origin URL 改 (隐含 5 仓 ahead 变化) |
+| #28 | +1 | 19:51 5 端口 L1 check |
+| #29 | 3 | 8h38m transcript 丢, snapshot 恢复 (不依靠 V 主动) |
+| #34 | **6** | 5 仓 dirty 285 报告 0 失实 |
+| #37 | **2** | watchdog 死 + 重启 + 9.5h 验证 3 commit |
+
+
 ## ✅ 6/18 11:13 检查点 (浮光 "保留当前进度")
 
 **触发**: 浮光 11:13 "先保留当前进度，不要忘记" — SOP #29 (transcript 丢) 预防
