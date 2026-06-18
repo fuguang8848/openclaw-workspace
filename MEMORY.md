@@ -2148,6 +2148,45 @@ cd ~/AgentSearch && python3 -m pytest tests/ -x --tb=short 2>&1 | tail -5
 |---|---|---|
 | #37 | **3** | 限制解: systemd user unit + kill/restart 测试 12s |
 
+## ✅ 6/18 20:36 AgentTeam ARCHITECTURE_REVIEW.md encoding fix (V 代 housekeeping)
+
+**触发**: 20:33 读 浮光 改的 2 docs, 查 ARCHITECTURE_REVIEW.md 653 lines diff
+
+**L1 verify (SOP #34)**:
+- `git diff -w` (忽略空白) = **0 lines 内容 diff**
+- xxd 老 vs 新 都是 CRLF + 中文 (老 mojibake "æ¡ææ¡" GBK-as-UTF8, 新 正确中文)
+- 内容 100% same, 只是 byte-level encoding 重新整理
+- 这是 housekeeping fix, V 可代 commit
+
+**V commit (浮光 拍板 跟 7 次 "按你的建议来")**:
+- `32597c0 chore(agentteam): ARCHITECTURE_REVIEW.md encoding fix (CRLF + mojibake 中文 → 正确)`
+- 1 file changed, 305 insertions(+), 305 deletions(-) (1:1 replace, 内容 same)
+- SOP #16 hook passed
+- 推到 fuguang8848/AgentTeam (ahead 0)
+
+**ORCHESTRATOR_COMPONENTS.md (V 不代 commit)**:
+- 浮光 8h 静默期间 写, 50+ lines 新内容
+- 解决 "AgentSupervisor/AgentManager 独立项目不存在" 困惑
+- 跟 6/18 10:50 报告失实 5.1 "AgentSupervisor 路径错" 应验
+- V 不可代 commit 新内容 (V 创 1 文档 = 假设 浮光 改)
+
+**AgentTeam dirty final**: 1 (剩 ORCHESTRATOR_COMPONENTS.md, 浮光 commit)
+
+**6/18 20:36 L1 final**:
+- 5 端口 6/6 UP
+- 5 仓 fuguang ahead 0 (全推完)
+- 5 仓 origin ahead 28 (10+13+1+4)
+- watchdog PID 12227 systemd-managed
+- workspace 6/18 commits 19 (since 19:51 +4: 91d28ee / 3f8ea8e / 4852a9f / f78d077)
+
+**6/18 SOP 应验 (含 20:36)**:
+| SOP | 应验 | 6/18 20:36 案例 |
+|---|---|---|
+| #15 | **9** | ARCHITECTURE_REVIEW.md encoding vs 内容 L1 |
+| #34 | **10** | -w 0 lines 内容 diff 验 encoding only, V 代 commit housekeeping |
+| #38 | **3** | AgentTeam encoding fix 推 fuguang8848 流程 验证 |
+
+
 
 
 
