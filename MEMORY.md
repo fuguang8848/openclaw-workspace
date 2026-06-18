@@ -1778,42 +1778,99 @@ python3 tools/v-snapshot.py activity --since "2026-06-15T22:00:00" --limit 20
 - watchdog 用 nohup 跑 (systemd 是未来选项, 浮光 拍板)
 - 5 仓只跟踪 master/main, 不跟踪 feature branches (v2 加)
 
-### 5 SOP 关联 (5 永久教训)
+### 6 SOP 关联 (5 永久教训)
 
 1. **SOP #32 + #33 互补** — #32 管 backup 文件, #33 管 git 状态. 6/18 AgentMemory 修复同时踩两个
 2. **SOP #34 是其他 4 个 SOP 的 meta-rule** — 任何 SOP 实装必 L1 verify, 6/18 立碑自验证
 3. **SOP #35 + #37 互补** — #35 解决 "积压" (主动推), #37 解决 "滞后" (被动通知)
 4. **5 SOP 都是 V 视角不抄报告** (SOP #34 起源) — 6/18 实战 = 验证, 不是 6/15 候选
 5. **5 SOP 6/18 实战 0 失实** — 5 SOP 0 SOP 失实 (对照 6/15 5 SOP 候选, 0 失实). 5 SOP 立碑后 V 工作流标准化
+6. **SOP #36 升级必带 test** — 5 SOP 修缺了 test, 6/18 10:17 立碑补上 (6/15 候选 → 6/18 应验, 顺序: #32-#35 #37, #36 补位)
 
-## ✅ 6/18 4 紧急修复 + 5 SOP 立碑 (V 09:35 总收工)
+## ✅ SOP #36 立碑 — 升级必带 test (V 6/18 10:17)
+
+**触发**: 6/15 21:50 V 推敲报告提的候选 #36 6 SOP之一 (顺序 6/15 提, 6/18 10:17 应验补立).
+
+**原始候选 (6/15 21:50 报告)**:
+> **SOP #36 — 升级 test 化** — 3 升级 (P1-5/6/7) 端到端只跑 demo, 没写 pytest. 任何 regression 不会发现
+
+**应验 (6/18 10:14)**:
+- AgentSearch `authority` 公式从线性 → log10 修 (V 6/18 10:14 commit `13f77ab`)
+- 修完默认不加 test, **SOP #36 应验于 V 自己** (跟 SOP #34 起源同型)
+- V 6/18 10:14 主动补 `tests/test_trust_score_log_scale.py` 6/6 pass (commit `c0eaf9e`)
+- 5 仓: 4 仓已 push (AgentTeam/AgentSearch/Agent-superthinking/AgentSafety) + 1 本地 (AgentMemory)
+
+**规则**:
+- 任何代码修改 (commit 含 `.py` / `.js` / `.ts` 等代码文件) 必带 test
+- 最小 test 数: 边界 1 + 公式 1 + regression 1 (3 个起步)
+- test 文件位置: `tests/test_<module>_<change>.py` (跟 module 名 + 改动点)
+- **修 SOP #36 起点: AgentSearch `_compute_trust_scores` 6 个 test**
+
+**6/18 10:14 test 内容**:
+- test_01: 0 stars → authority=0 (边界)
+- test_02: 10/100/1000/10000 stars 各点 (公式)
+- test_03: trust_score spread > 0.05 (旧 bug 全 0.97 regression)
+- test_04: 新+低 stars > 旧+高 stars (freshness 起作用)
+- test_05: 实地 GitHub API spread > 0.01 (production)
+- test_06: log scale 严格递增 (回归保护)
+- **6/6 pass in 0.5s**
+
+**测试覆盖原则** (跟 SOP #28 L1/L2 联动):
+- L1: 函数单调用返回预期值
+- L2: 函数跟其他模块联动 (跟 SearchSkill + SearchResult 集成)
+- Edge case: 边界 + 异常 + 饱和
+- Regression: 旧 bug 不能重出现
+
+**V 启动检查 (BOOT.md 加)**:
+```bash
+# 任何 .py commit 后必跑 pytest (3 分钟内完成)
+cd ~/AgentSearch && python3 -m pytest tests/ -x --tb=short 2>&1 | tail -5
+```
+
+**6 SOP 总览**:
+| # | 主题 | 起源 | 6/18 应验 |
+|---|---|---|---|
+| #32 | `.bak` 备份生命周期 | 6/15 AgentTeam 274 累积 | 6/18 AgentMemory .gitignore fix |
+| #33 | Detached HEAD / 0-commit 检测 | 6/15 AgentMemory 状态异常 (失实) | 6/18 5 项检测 + symlink 修 |
+| #34 | V 整理的 SOP 必 L1 复核 | 6/15 ahead 50+ 失实 | 6/18 3 仓 ahead L1 |
+| #35 | 5 仓 ahead 推 origin 节奏 | 6/15 ahead 50+ 积压 | 6/18 推 AgentTeam 20 + 3 commit |
+| #36 | 升级必带 test | 6/15 3 升级 demo 无 pytest | **6/18 10:14 AgentSearch 6 test** |
+| #37 | 5 仓 git activity 通知 | 6/15 21:14 16 分钟滞后 | 6/18 09:40 实装 + 9:52 首次实战 |
+
+## ✅ 6/18 4 紧急修复 + 6 SOP 立碑 (V 10:17 总收工)
 
 ### 4 紧急修复
 1. **修 8080** — 2 bug (commands `__init__.py` 缺顶层 app, board/server.py 缺 run_server alias)
 2. **修 AgentMemory** — symlink 错位 + 0 commit → `2710ea3 on master`, 112 files, 18k lines, 3 周 v3+ 工作入仓
 3. **推 3 仓 (L1 复核先做, SOP #34 应验)** — AgentTeam 20 commits → fuguang8848 fork
-4. **5 SOP 立碑** — #32 #33 #34 #35 #37
+4. **6 SOP 立碑** — #32 #33 #34 #35 #36 #37
 
 ### L1/L2 验证 (SOP #28)
 - 5 端口: 6005=401, 6006=302, 11434=200, **8080=200 ✅**, 18081=404 (orchestra watchdog 接受 404)
 - 3 仓 ahead 推后: superthinking 0 / AgentSearch 0 / AgentTeam 0 ✅
 - AgentMemory master: 2710ea3 (有 commit, import OK, 0 regression) ✅
-- 5 SOP 在 MEMORY.md 永久立碑 ✅
+- 6 SOP 在 MEMORY.md 永久立碑 ✅
+- AgentSearch log scale fix + 6 test 6/6 pass ✅
 
-### SOP #15 #29 #34 应验 (3 次)
+### SOP #15 #29 #34 #36 应验 (4 次)
 
 | SOP | 应验次数 | 6/18 案例 |
 |---|---|---|
 | #15 (报告数字 L1) | 第 N 次 | 6/18 ahead 38 (实测) vs 50+ (6/15 报告) |
 | #29 (transcript 丢) | 第 3 次 | 6/18 3 天空白 83h, snapshot recovery |
 | #34 (V SOP 必 L1) | 第 3 次 | 6/18 ahead L1 复核, AgentMemory symlink 复核 |
+| #36 (升级必带 test) | **第 1 次** | 6/18 10:14 log scale 修后 V 主动补 6 test |
 
 ### 报告产出
-- `~/.openclaw/workspace/memory/2026-06-18.md` (8205 B, 6/18 全日志)
-- `~/.openclaw/workspace/MEMORY.md` 5 SOP 永久立碑
+- `~/.openclaw/workspace/memory/2026-06-18.md` (10269 B, 6/18 全日志)
+- `~/.openclaw/workspace/MEMORY.md` 6 SOP 永久立碑
+- `~/AgentSearch/tests/test_trust_score_log_scale.py` (6 test, 6/6 pass)
 
 ### 遗留 (6/19 拍板)
 - AgentMemory 2710ea3 是否 force-push 到 origin (YintaTriss upstream)? — 6/15 没列入, 6/18 也没推
 - SOP #37 inotify 实装 — ✅ **6/18 09:40 完成** (commit `6be2e50`), polling 不用 inotify
 - 274 .bak-pre-sop16 真清 (SOP #32 7 天规则触发后自动) — 6/22 自动
 - 6/16-6/17 浮光 推 28 commit 的 16 报告在哪里? — SOP #37 起点问题, 6/18 09:40 已补: V 启动读 activity log
+- **AI 可靠性报告 6 项目参考 (flow/Overseer/agentic-swmm-workflow/LLM-TrustGuard/ARLC/Autonomous-CI)** — V 升级时参考, 6/18 L1 verify 6/6
+- **AgentSearch log scale fix + 6 test 应验 SOP #36** — 6/18 10:14, V 主动补 test 防回归
+- **5 仓 ahead 累计 21 超 SOP #35 阈值 10** — Agent-superthinking 8 + AgentSearch 13 推 fuguang fork, YintaTriss 上游未动
