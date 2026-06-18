@@ -2241,6 +2241,67 @@ cd ~/AgentSearch && python3 -m pytest tests/ -x --tb=short 2>&1 | tail -5
 | #34 | **11** | PR base/head L1 + 13 commit 真验 |
 | #38 | **4** | SOP #38 6 步流程实装 (新 PR #2) + YintaTriss 写权边界发现 |
 
+## ✅ 6/18 21:22 Agent-superthinking PR #5 filter-branch (.backup 删)
+
+**触发**: 21:12 浮光 看到 AgentSearch PR diff 含 .bak 后, V 21:14 L1 check Agent-superthinking PR #4 19 files 也有 1 个 `SKILL.md.v5.backup` (302 lines, V v6 升级 SKILL.md v5→v6 时的备份, 不属 SOP #16 `.bak-pre-*` pattern).
+
+**修复 (A 选项, 跟 AgentSearch 一样)**:
+1. `git stash` (保存 rm uncommitted)
+2. `git filter-branch -f --index-filter 'git rm --cached --ignore-unmatch SKILL.md.v5.backup' HEAD~10..HEAD` (10 commit 重写)
+3. `git push --force` → fuguang8848/Agent-superthinking 同步
+4. L1: `git ls-files | grep .backup` 空 ✅
+5. 新 HEAD = `9db458fb40bd2d2e3623cec7029c2318f3c405e6` (旧 eba2b83)
+
+**PR #4 closed (V 可 close, 不可 reopen)**:
+- `PATCH /pulls/4 {state: closed}` 成功 (V 可 close, 但不可 reopen, YintaTriss 写权边界)
+- PR #4 留 closed, 含 .backup 历史 (但 head SHA 被 GitHub auto-update 到 9db458f due to force-push)
+
+**创 new PR #5**:
+- `POST /repos/YintaTriss/Agent-superthinking/pulls` → 创成功 PR #5
+- head: fuguang8848:master@9db458f, base: YintaTriss:master@1bb226f
+- 18 files (vs PR #4 19 files, 1 .backup 删)
+- additions=2210 (vs 2512, 减 302)
+- mergeable=True state=clean ✅
+
+**L1 verify (SOP #34)**:
+- base 1bb226f 在 local 历史: YES
+- 10 commit ahead (跟 PR #4 数量同, SHA 改)
+- 10 commit 全 验: 9db458f/fdf8607/4837bca/c587e91/e0bd2e6/685a86a/a16b31e/4dfe3cd/ddc830f/ef326bf
+
+**SOP #38 #5 应验**: V 可 close PR 但 不可 reopen. YintaTriss 写权边界:
+- PR close: V 可 (维持写权下限)
+- PR reopen: V 不可 (需 mainter 权, 4 个 API calls 都 reject)
+- 新 PR 创建: V 可 (PAT 有 PR create scope)
+- Merge: V 不可 (需 YintaTriss 写权)
+
+**6/18 21:22 L1 final**:
+- 5 端口 6/6 UP
+- 5 仓 fuguang ahead 0 (全推完)
+- 5 仓 origin ahead 28 (10+13+1+4)
+- 2 open PR (AgentSearch #2 + Agent-superthinking #5) 浮光 可 1-click merge
+- 2 closed PR (AgentSearch #1 + Agent-superthinking #4, 含 .bak/.backup)
+- watchdog PID 12227 systemd 24/7
+
+**6/18 SOP 应验 (含 21:22)**:
+| SOP | 应验 | 6/18 21:22 案例 |
+|---|---|---|
+| #15 | **11** | Agent-superthinking PR .backup 失实 + filter-branch 修复 |
+| #16 | **4** | 备份 hook 留 commit (SKILL.md.v5.backup 不是 SOP #16 pattern 但同 性质) |
+| #34 | **12** | filter-branch L1 + 10 commit 重写 + PR base/head 验 |
+| #38 | **5** | SOP #38 6 步 实装 PR #5 + YintaTriss close 权 vs reopen 权 边界 |
+
+**SOP #38 #5 永久教训立碑**:
+- V 可 close YintaTriss PR (PR close 权 低)
+- V 不可 reopen YintaTriss PR (reopen 需 maintainer)
+- V 可 创 new PR (PAT scope 含 PR create)
+- V 不可 merge YintaTriss PR (merge 需 YintaTriss 写权)
+- **修复坏 PR 标准流程**: close 旧 + filter-branch + force-push + 开 new PR
+
+**SOP #16 #4 永久教训立碑**:
+- V 改 SKILL.md v5→v6 时 备份 `SKILL.md.v5.backup` 不是 `.bak-pre-*` pattern
+- `.gitignore` 应加 `*.backup` 跟 `*.bak-pre-*` 两套 pattern
+- 任何 v5→v6 升级 backup 都不该入 PR
+
 
 
 
