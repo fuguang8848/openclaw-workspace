@@ -2341,6 +2341,62 @@ cd ~/AgentSearch && python3 -m pytest tests/ -x --tb=short 2>&1 | tail -5
 | #34 | **13** | 5 仓 ahead 27 仍超 SOP #35 阈值 20 |
 | #38 | **6** | V 不可 merge (写权边界), comment 提交 (@YintaTriss) 代替 |
 
+## ✅ 6/18 21:42 检查点 (浮光 '保存当前进度')
+
+**触发**: 21:42 浮光 "保存当前进度" — SOP #29 (transcript 丢) 预防
+
+**保存状态**:
+- v-snapshot: `2026-06-18-214253-423.json` (5196 B)
+- git tag: `checkpoint-6-18-2142` (回滚保险)
+- workspace 21 commits today, 0 dirty, 0 untracked
+- 5 仓 HEAD: superthinking `9db458f` / AgentSearch `c258f59` / AgentTeam `32597c0` / AgentMemory-upgrade `9fb2a55` / AgentSafety `906101f`
+- 5 端口: 6005/6006/18081/8080/11434/18789 全 UP
+- 5 仓 ahead 累计 27 (SOP #35 阈值 20, 超 7)
+- 2 open PR (AgentSearch #2 + Agent-superthinking #5) — comment 提交 等 maintainer merge
+- 2 closed PR (AgentSearch #1 + Agent-superthinking #4)
+- watchdog PID 12227 稳定 (SOP #37 systemd 1h 19m uptime)
+- 71 sessions today snapshot
+- HEARTBEAT.md active, 每次 heartbeat 跑 SOP #28 L1 + SOP #37 activity
+
+**6/18 21 commit 完整 commit graph** (L1 验证存于 snapshot):
+1. 40f44d3 — 5 SOP 立碑 (#32-#35 #37)
+2. 6be2e50 — SOP #37 实装
+3. b34da43 — SOP #37 实施完成
+4. e165592 — 6/18 09:50 总结
+5. c5a7e77 — HEARTBEAT.md
+6. cc23d67 — SOP #36 立碑
+7. e598ce0 — 报告失实 L1 体系
+8. 2b41a9a — SOP #38 立碑
+9. 561721d — 12 dirty 清理
+10. 3f25cf7 — 6/18 11:11 完整日志
+11. 3d82cfe — 11:13 检查点
+12. 91d28ee — SOP #37 限制解
+13. 3f8ea8e — systemd unit
+14. 4852a9f — AgentMemory-v3 仓
+15. f78d077 — 19:51 恢复
+16. 527758e — 6/18 wrap
+17. c0159d1 — HEARTBEAT.md 6/19
+18. b94cad6 — encoding fix
+19. 0cdd073 — filter-branch PR .bak
+20. f743a11 — filter-branch PR .backup
+21. fb88128 — YintaTriss 写权边界
+
+**防失机制** (SOP #29 联动):
+- snapshot 文件 `.v-snapshot/` (71 份 today, latest 21:42)
+- git tag `checkpoint-6-18-2142` + `checkpoint-6-18-1113` (回滚保险)
+- 5 仓 commit 已推 fuguang8848 fork (ahead 0)
+- 27 sessions today in .v-snapshot/ (active session)
+- HEARTBEAT.md active, systemd-managed 24/7
+
+**V 启动恢复流程** (SOP #29):
+1. 读 latest snapshot `2026-06-18-214253-423.json`
+2. 读 `next actions` + `last decisions`
+3. 读 MEMORY.md 6/18 21:42 检查点 section
+4. `git checkout checkpoint-6-18-2142` if needed
+5. 读 `memory/2026-06-18.md` (351 行完整日志)
+6. 5 仓 ahead 27, 2 PR open 等 maintainer merge
+
+
 
 
 
