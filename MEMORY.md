@@ -1733,16 +1733,50 @@ git -c credential.helper= \
 - V 收到: "X 仓有新活动, ahead=N, 详情..."
 - 不需 V 主动查 (SOP #29 起源: 被动恢复)
 
-**6/18 实战**: 未实装 (6/18 是候选, 6/19 浮光 拍板再实装)
+**实装 (6/18 09:40 V) — `tools/v-git-activity-watchdog.sh`** (commit `6be2e50`):
+
+```bash
+# polling (30s) 不 inotify — inotifywait 未装, 安装需 root
+# grace 60s 启动期只 check 不 save (跟 v-services-watchdog.sh 同步, SOP #30)
+# 5 仓: Agent-superthinking / AgentSearch / AgentTeam / AgentSafety / AgentMemory-upgrade
+# VCPToolBox 不是 git 仓, 排除
+```
+
+**3 个 v-snapshot.py 子命令**:
+- `watch` — 5 仓 HEAD SHA 变化检测, exit 0=无活动, exit 1=活动
+- `activity` — 读 git-activity.jsonl, `--since ISO --limit N`
+- `git-state` — 当前 5 仓 SHA/branch/ahead/behind 快照
+
+**存储**:
+- `.v-snapshot/git-state.json` (last known HEAD SHA per repo, atomic write)
+- `.v-snapshot/git-activity.jsonl` (append-only activity log, V 启动时读)
+
+**BOOT.md 升级**:
+- 加 `v-snapshot.py activity --since <last>` 启动检查
+- 避免 SOP #29 起源的 83h 滞后场景再次发生
+
+**端到端验证 (V 09:40)**:
+1. grace 60s (09:39:21 启动 → 09:40:21 grace over)
+2. 切 normal → 30s/圈检测
+3. AgentSearch commit → watch exit 1, save snapshot, append activity log
+4. reset --hard → watch exit 1 (rollback 也算活动), save snapshot, append
+5. 静默 cycle 验证: 下一个 30s → "✅ 5 仓无活动"
+
+**V 启动时 (BOOT.md 第 3 步)**:
+```bash
+python3 tools/v-snapshot.py activity --since "2026-06-15T22:00:00" --limit 20
+# 输出: 6/16-6/18 期间 5 仓的所有 commit 记录
+```
 
 **与 SOP #29 关系**:
 - #29: transcript 丢 → V 失忆 → snapshot 恢复
-- #37: 仓活动 → V 滞后 → inotify 通知
+- #37: 仓活动 → V 滞后 → polling 检测 + activity log
 - 互补: #29 解决 "失忆" 问题, #37 解决 "滞后" 问题
 
-**实装位置候选**:
-- `tools/v-services-watchdog.sh` 加 inotifywait 段 (30s 轮 + inotify 触发)
-- 或独立 `tools/v-git-activity-watchdog.sh` (单独跑)
+**已知限制**:
+- inotify 不可用 (polling 30s 代替), 系统装 inotifywait 后可改回 inotify (亚秒级响应)
+- watchdog 用 nohup 跑 (systemd 是未来选项, 浮光 拍板)
+- 5 仓只跟踪 master/main, 不跟踪 feature branches (v2 加)
 
 ### 5 SOP 关联 (5 永久教训)
 
@@ -1780,6 +1814,6 @@ git -c credential.helper= \
 
 ### 遗留 (6/19 拍板)
 - AgentMemory 2710ea3 是否 force-push 到 origin (YintaTriss upstream)? — 6/15 没列入, 6/18 也没推
-- SOP #37 inotify 实装 — 6/19 拍板
+- SOP #37 inotify 实装 — ✅ **6/18 09:40 完成** (commit `6be2e50`), polling 不用 inotify
 - 274 .bak-pre-sop16 真清 (SOP #32 7 天规则触发后自动) — 6/22 自动
-- 6/16-6/17 浮光 推 28 commit 的 16 报告在哪里? — 浮光 没给 V transcript, V 也没自动捕获
+- 6/16-6/17 浮光 推 28 commit 的 16 报告在哪里? — SOP #37 起点问题, 6/18 09:40 已补: V 启动读 activity log
