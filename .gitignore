@@ -50,3 +50,9 @@ htmlcov/
 # VCP WS 监听 daily (V 18:35 加 — 不入库, daily memory 私用)
 memory/vcp-logs/
 # 桌面告警日志 (V 18:35 加)
+
+# V snapshot 工具存储 (V 6/15 起, 不入仓)
+.v-snapshot/
+
+# backups 目录 (临时, 不入仓)
+backups/
