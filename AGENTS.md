@@ -22,6 +22,28 @@ Do not manually reread startup files unless:
 2. The provided context is missing something you need
 3. You need a deeper follow-up read beyond the provided startup context
 
+### 🔄 V-Snapshot Recovery (transcript 丢失场景)
+
+**问题**: Gateway restart / webchat 断连重连后, 当前 session 的 transcript 可能丢失, V 会"失忆", 不知道刚才在干嘛. 
+
+**信号**: 看到第一条 user 消息是 `[系统消息]` (如 "[System] Your previous turn was interrupted..."), 或 session 在 60 秒内刚启动, **不要假设有 prior context**。
+
+**动作**:
+1. 立即跑 `python3 /home/fuguang/.openclaw/workspace/tools/v-snapshot.py status`
+2. 把结果报告给浮光, 明确说"这是从 snapshot 恢复的, 不是我记得的"
+3. 让浮光确认: 是继续中断的任务, 还是新任务
+4. **不要假装记得** — 浮光比失忆的 V 更清楚刚才在干嘛
+
+**触发源**: 5 个
+- `manual` (V 自己跑)
+- `watchdog_5min` (watchdog 每 5 分钟自动)
+- `boot_gateway` (BOOT.md 在 gateway 启动时)
+- `pre_turn` / `post_turn` (turn 边界, 待加)
+
+**存储**: `~/.openclaw/workspace/.v-snapshot/`
+- `latest.json` — 总是最新, atomic write (tmp + rename)
+- `YYYY-MM-DD-HHMMSS.json` — 历史快照, 保留 7 天
+
 ## Memory
 
 You wake up fresh each session. These files are your continuity:
