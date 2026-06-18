@@ -1861,10 +1861,62 @@ cd ~/AgentSearch && python3 -m pytest tests/ -x --tb=short 2>&1 | tail -5
 | #34 (V SOP 必 L1) | 第 3 次 | 6/18 ahead L1 复核, AgentMemory symlink 复核 |
 | #36 (升级必带 test) | **第 1 次** | 6/18 10:14 log scale 修后 V 主动补 6 test |
 
+## ✅ 报告失实 L1 体系 (V 6/18 10:35 SOP #15 应验 +5 实际案例)
+
+**起源**: AI 超级大脑增强综合报告 (`桌面/AI超级大脑增强综合报告_2026-06-18.md`, 10:05 写) 7 个 P0/P1 报告 5/5 失实, V L1 后发现. 6/18 10:35 记为 SOP #15 第 5 次应验.
+
+**报告 P0/P1 失实 5/5 (100%)**:
+| # | 报告声称 | L1 实测 | 失实类型 |
+|---|---|---|---|
+| 1 | P0 JuryResult 缺 analysis_metadata (7 文件) | ✅ 真 (1 字段缺, 1 文件 super_brain.py:174 调) | 报告夸大 (6 幽灵文件) |
+| 2 | P0 身份证正则 `\d{8}` skill.py:568 | ❌ skill.py:603, 实际 `(19\|20)\d{2}(0[1-9]\|1[0-2])...` 有边界 | **报告失实** (行号 + 描述) |
+| 3 | P1 PolicyRule.matches target=None 错误返回 | ❌ 实测: 行为正确, target=None→False | **报告失实** |
+| 4 | P1 AgentSafety 5 rules 拦截 OK | ❌ `AttributeError: 'str' object has no attribute 'risk_score'` (subagent 传 string, API 错) | **报告失实** (测试方法错) |
+| 5 | AgentMemory 8/8 PASS | ❌ `MemoryManager` 类不存在 (V 6/18 改 v2.0.0 API, subagent 用旧 API) | **报告失实** (API outdated) |
+
+**报告子系统 4/4 测试 1 真 + 3 失实 (75%)**:
+| 系统 | 报告 | L1 | 失实原因 |
+|---|---|---|---|
+| AgentMemory 8/8 | OK | MemoryManager 不存在 | V 6/18 改 v2.0.0, subagent 用旧 API |
+| AgentSafety 5 rules | OK | AttributeError | subagent 测试方法错 |
+| AgentSupervisor workflow | OK | Supervisor 模块错 (在 agent_search) | 路径错 |
+| AgentManager list | OK | ✅ 真 + JSON 警告 | — |
+
+**总计 9 报告项**: 2 真 + 7 失实 (**78% 失实率**).
+
+**6/18 Jury bug 真实, V 修了** (commit `2fd0c7d` + 6 test + push fuguang8848) — 报告仍产出 1 个实际价值.
+
+**重要原则 (跟 AI 可靠性报告 §1.1 第 3 行一致)**:
+- "信任 subagent 的 summary → 不可全信" — 50-78% 失实率常见
+- **报告 P0 严重度必 L1 verify**, 不能按报告直接修 (会修错 bug)
+- **报告 + L1 verify 是 V 接受外部输入的唯一模式**
+- **报告 1 真 + 修 1, 报告本身仍失实但指向正确方向** — 报告有用但需验证
+
+**V 决策矩阵 (SOP #15 应用)**:
+| 报告严重度 | 报告类型 | V 动作 |
+|---|---|---|
+| P0 真 bug | 报告加 L1 | 修 + 6 test + push + MEMORY 记 |
+| P0 失实 | subagent 幻觉 | 不修, 报告失实到浮光 (本次) |
+| P1 真 | 报告加 L1 | 修 (如果有空) |
+| P1 失实 | subagent 幻觉 | 不修, 报告失实到浮光 |
+
+**SOP #15 总应验次数 (V 6/18 10:35)**: 5 次
+1. 6/15 ahead 50+ 失实 (起源)
+2. 6/15 AgentMemory HEAD detached 失实
+3. 6/15 board/utils.py:59 幽灵
+4. 6/18 3 仓 ahead L1 复核
+5. 6/18 AI 超级大脑报告 5/5 P0/P1 失实 (本次)
+
+**subagent 质量差异 (V L1 5 报告后体会)**:
+- AI 可靠性报告 (6/18 09:51): 0/6 失实 (高质量)
+- AI 超级大脑增强报告 (6/18 10:05): 5/5 P0/P1 失实 + 4/4 子系统 3 失实 (低质量)
+- **结论**: 报告质量跟 subagent 类型强相关, Hermes 报告高质量, parallel subagent 报告需 L1
+
 ### 报告产出
 - `~/.openclaw/workspace/memory/2026-06-18.md` (10269 B, 6/18 全日志)
-- `~/.openclaw/workspace/MEMORY.md` 6 SOP 永久立碑
+- `~/.openclaw/workspace/MEMORY.md` 6 SOP 永久立碑 + 报告失实体系
 - `~/AgentSearch/tests/test_trust_score_log_scale.py` (6 test, 6/6 pass)
+- `~/Agent-superthinking/tests/test_jury_analysis_metadata.py` (6 test, 6/6 pass)
 
 ### 遗留 (6/19 拍板)
 - AgentMemory 2710ea3 是否 force-push 到 origin (YintaTriss upstream)? — 6/15 没列入, 6/18 也没推
@@ -1873,4 +1925,6 @@ cd ~/AgentSearch && python3 -m pytest tests/ -x --tb=short 2>&1 | tail -5
 - 6/16-6/17 浮光 推 28 commit 的 16 报告在哪里? — SOP #37 起点问题, 6/18 09:40 已补: V 启动读 activity log
 - **AI 可靠性报告 6 项目参考 (flow/Overseer/agentic-swmm-workflow/LLM-TrustGuard/ARLC/Autonomous-CI)** — V 升级时参考, 6/18 L1 verify 6/6
 - **AgentSearch log scale fix + 6 test 应验 SOP #36** — 6/18 10:14, V 主动补 test 防回归
-- **5 仓 ahead 累计 21 超 SOP #35 阈值 10** — Agent-superthinking 8 + AgentSearch 13 推 fuguang fork, YintaTriss 上游未动
+- **Agent-superthinking Jury fix + 6 test 应验 SOP #36** — 6/18 10:30, 报告 5/5 P0/P1 失实中找出 1 真 bug 修了
+- **5 仓 ahead 累计 22 超 SOP #35 阈值 20** — Agent-superthinking 9 + AgentSearch 13 推 fuguang fork, YintaTriss 上游未动
+- **AI 超级大脑报告 5/5 P0/P1 失实** — V 不修 4 失实 (照修会修错), 已立碑 SOP #15 第 5 次
