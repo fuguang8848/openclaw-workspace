@@ -1,0 +1,29 @@
+[Unit]
+Description=V git activity watchdog — 5 仓 git activity 检测 (SOP #37 实施)
+Documentation=https://github.com/fuguang8848/openclaw-workspace
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/env bash /home/fuguang/.openclaw/workspace/tools/v-git-activity-watchdog.sh
+Restart=always
+RestartSec=10
+StandardOutput=append:/tmp/v-git-activity-watchdog.log
+StandardError=inherit
+WorkingDirectory=/home/fuguang/.openclaw/workspace
+
+# 环境变量 (避免 systemd 内 PATH 问题)
+Environment=USER=fuguang
+Environment=HOME=/home/fuguang
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# 资源限制 (跟 v-services-watchdog.sh 同等)
+MemoryMax=256M
+CPUQuota=20%
+
+# 安全 (OpenClaw sandbox 友好, 不要过严)
+NoNewPrivileges=false
+PrivateTmp=false
+
+[Install]
+WantedBy=default.target
