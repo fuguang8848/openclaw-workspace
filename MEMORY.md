@@ -2444,3 +2444,63 @@ cd ~/AgentSearch && python3 -m pytest tests/ -x --tb=short 2>&1 | tail -5
 - git checkout `checkpoint-6-18-1113` if needed
 - 读 6/18 完整日志 (memory/2026-06-18.md, 286 行)
 
+
+## ✅ 6/19 17:32 检查点 (浮光 "？" — SOP #29 第 4 次应验, 20h 静默)
+
+**触发**: 浮光 17:55 "？" + 18:00 "按你的建议继续" + 18:05 "继续" — V 失忆 20h 静默后 浮光 拍板 V 自主
+
+**6/19 18:05 L1 状态** (SOP #34):
+- workspace ahead: 0 (39 commit 推完, c0a3fca on origin)
+- 5 仓 ahead 累计 23 (SOP #35 阈值 20):
+  - Agent-superthinking 10 (PR #5 open, 21h+ 等 maintainer)
+  - AgentSearch 13 (PR #2 open, 21h+ 等 maintainer)
+  - AgentTeam 0 / AgentMemory-upgrade 0 (v3 仓 5 commit 已推) / AgentSafety 0
+- 5 端口 6/6 UP: 6005/6006/18081/8080/11434/18789
+- watchdog PID 2433 systemd 24/7 (1h 38m uptime)
+- 2 dirty: 0 (V 6/19 18:00 全清), AgentTeam ORCHESTRATOR_COMPONENTS.md 留浮光 commit
+- 2 PR 维护者没回 (V 6/18 21:39 comment, 维护者 0 回应)
+
+**6/19 V 自主完成 5/6 拍板** (SOP #38 #6 YintaTriss 写权边界):
+- #2 AgentMemory-upgrade .gitignore 修复 (V 6/18 9:11 加的 __pycache__ + *.pyc + *.egg-info + *.bak-pre-* 被浮光 6/18 改丢, 6/19 恢复完整 ignore + 推 v3 仓 5 commit 68c6019)
+  - **SOP #32 #2 应验** (浮光 改丢 V 加的 ignore) + **#33 #2 应验** (v3 vs v2 fork 无关历史) + **#35 #2 应验** (推 v3 仓 5)
+- #4 workspace origin URL 改回 (清明文 PAT `ghp_ei…r7jz@github.com` → ghproxy 加速 + credential helper)
+  - **SOP #15 #7 应验** (浮光 8h 静默改 URL 加明文 PAT)
+- #6 workspace 推 origin (38+1 ahead → 0)
+  - GH secret scan 拦 5 commit (3b0aafc + 775b854 + 115bd4ab + 07b992c + 6852dc9) 含完整 PAT
+  - filter-branch HEAD~38..HEAD 改 memory/2026-06-07.md 完整 PAT → `ghp_ei…r7jz` 占位 (SOP #16 复用)
+  - 38 commit 重写, force-push origin a4528f0..ba2cc94 ✅
+  - V 6/19 commit 47ff70a 又把完整 PAT 写进 daily log, GH 拦 → 改占位 → amend c0a3fca → 重推 ✅
+  - **SOP #15 #8 应验** (V 写 daily log 必 grep 完整 PAT 占位, 跟 SOP #15 #1 同源)
+- #5 AgentMemory-v3 B 选项 (留 v3 独立, v2 fork 走 6/13 line, V 不动)
+- #3 ORCHESTRATOR_COMPONENTS.md 留浮光 (V 不可代 commit 新内容, 212 行, 浮光 写)
+
+**6/19 20 commit workspace filter-branch 重写后**:
+1. ba2cc94 — 6/18 21:42 检查点 (filter-branch 38 commit 范围起点, 实际最早是 HEAD~38 = 6852dc9 6/7 13:55)
+2. c0a3fca — 6/19 17:32 恢复 + 5 拍板 (SOP #29 #4 + #15 #7/#8 + #32 #2 + #34 #5 应验)
+(中间 37 commit 是 filter-branch 改占位后重写, SHA 全变)
+
+**SOP 应验累计** (6/19 18:05):
+| SOP | 应验次数 | 6/19 案例 |
+|---|---|---|
+| #15 | **8** | workspace origin URL 含明文 PAT (浮光 改) + V 6/19 commit 又写完整 PAT |
+| #29 | **4** | 20h 静默 浮光 "？" 触发 snapshot 恢复 |
+| #32 | **2** | AgentMemory-upgrade .gitignore 浮光 改丢 V 加的 |
+| #33 | **2** | AgentMemory v3 vs v2 fork 无关历史 |
+| #34 | **5** | 5 仓 ahead + 2 PR state + 2 dirty 复核 |
+| #35 | **2** | 推 v3 仓 5 commit (B 选项下) |
+| #36 | 2 | (6/18 沿用, 6/19 无新升级) |
+| #37 | 1 | (6/18 实装, 6/19 静默期 0 commit) |
+| #38 | **2** | YintaTriss 写权边界 + V 不可代 commit 新内容 |
+
+**V 启动恢复流程** (SOP #29 联动):
+- 读 latest snapshot `2026-06-19-183022-xxx.json` (6/19 18:30 还在跑)
+- 读 `next actions` + `last decisions` (snapshot 字段)
+- 读 MEMORY.md 6/19 17:32 检查点 section (本段)
+- 读 `memory/2026-06-19.md` (5286 B, 6/19 完整日志)
+- 5 仓 ahead 23, 2 PR 等 maintainer
+
+**6/20 待办**:
+- 6/20 9:00 daily check (SOP #28 L1)
+- 6/22 SOP #32 自动清 .bak-pre-sop16 (3 天后, cron 触发)
+- PR 维护者回应 (推 maintainer, 浮光 拍板)
+- 浮光 commit ORCHESTRATOR_COMPONENTS.md
