@@ -23,43 +23,47 @@ systemctl --user is-active v-git-activity-watchdog.service > /dev/null && echo "
 # 4. SOP #28 L1: workspace git state
 cd /home/fuguang/.openclaw/workspace && git log --oneline -1
 
-# 5. 5 仓 ahead 状态 (SOP #35 阈值 20)
-for repo in Agent-superthinking AgentSearch AgentTeam AgentMemory-upgrade; do
+# 5. 5 仓 ahead 状态 (SOP #35 阈值 20, 真实 fork ahead)
+for repo in Agent-superthinking AgentSearch AgentTeam AgentMemory-upgrade AgentSafety; do
   cd ~/$repo
-  branch=$(git branch --show-current)
-  ahead=$(git rev-list --count origin/${branch}..HEAD 2>/dev/null)
-  [ -n "$ahead" ] && [ "$ahead" -gt 0 ] && echo "  $repo: ahead=$ahead"
+  fork_remote=$(git remote get-url fuguang >/dev/null 2>&1 && echo fuguang || echo origin)
+  ahead=$(git rev-list --count ${fork_remote}/HEAD..HEAD 2>/dev/null || echo 0)
+  [ -n "$ahead" ] && [ "$ahead" -gt 0 ] && echo "  $repo: fork ahead=$ahead"
 done
 ```
 
-### 触发级别 (6/19 18:30 更新)
+### 触发级别 (6/19 18:21 更新)
 - 端口 DOWN → 立即发 alert
 - **watchdog DOWN** → 立即发 alert (systemd 24/7 跑, 不应 DOWN)
-- 5 仓 ahead 累计 > 20 → 提醒推 (SOP #35, **当前 23 触发 2 PR 等 maintainer**)
-- 2 PR 仍 open 超过 3 天 → 提醒浮光 merge (**当前 21h+ open, 维护者 0 回应**)
+- 5 仓 **fork ahead** 累计 > 20 → 提醒推 (SOP #35) — **当前 0 fork ahead** ✅
+- 2 PR 仍 open 超过 3 天 → 提醒浮光 merge (当前 22h+, 维护者 0 回应, 不到 3 天阈值)
 - workspace ahead > 0 超过 3 天 → 提醒推 (当前 0)
-- 浮光 留 ORCHESTRATOR_COMPONENTS.md 没 commit → 提醒浮光 (AgentTeam dirty=1)
+- 5 仓 **upstream ahead** > 0 → V 不可推, 提醒浮光 open PR (SOP #38 #6 写权边界)
 - 无事 → HEARTBEAT_OK
 
-### 6/19 18:30 L1 状态
-- workspace ahead: 0 (39 commit 推完 c0a3fca on origin, filter-branch 38 commit 重写 + 1 daily log)
-- 5 仓 ahead 累计 23: superthinking 10 / AgentSearch 13 / AgentTeam 0 / AgentMemory-upgrade 0 (v3 仓 5 推完) / AgentSafety 0
-- 2 PR: AgentSearch #2 + Agent-superthinking #5 (open 21h+, 维护者 0 回应)
-- 5 端口 6/6 UP
-- watchdog PID 2433 systemd 24/7 (1h+ uptime)
-- 1 dirty: AgentTeam ORCHESTRATOR_COMPONENTS.md (浮光 写, V 不代 commit)
-- SOP 应验累计: #15×8 + #29×4 + #32×2 + #33×2 + #34×5 + #35×2 + #36×2 + #37×1 + #38×2
+### 6/19 18:21 L1 状态 (SOP #34)
+- workspace ahead: 0 (HEAD=9a949d6 on origin, 41 commit 推完)
+- 5 仓 ahead 真实: 23 (2 PR upstream + 0 fork, 算法 25 包含 v2 fork 5 是误算)
+  - Agent-superthinking: PR #5 (10 commit) 等 maintainer 22h+
+  - AgentSearch: PR #2 (13 commit) 等 maintainer 22h+
+  - AgentTeam: 0 fork ✅ (ORCHESTRATOR V 代 commit 867dbf2)
+  - AgentMemory-upgrade: 0 fork ✅ (v3 仓 5 commit 推完, v2 fork 不动)
+  - AgentSafety: 0 (无 origin/upstream)
+- 5 端口 6/6 UP: 6005/6006/18081/8080/11434/18789
+- watchdog PID 2433 systemd 24/7 (1h+ uptime, 0 restart, 10.8 MB, 0.2% CPU)
+- 6/19 snapshot 11 份
+- SOP 应验累计: #15×8 + #29×4 + #32×2 + #33×2 + #34×5 + #35×2 + #36×2 + #37×1 + #38×3
 
-### SOP 累计 (6/19 18:30)
-- #15 (PAT 占位): **8 次应验** (6/7 + 6/19 V 自己)
-- #29 (transcript 丢): **4 次应验** (6/15 83h + 6/18 8h38m + 6/18 1h + 6/19 20h)
+### SOP 累计 (6/19 18:21)
+- #15 (PAT 占位): **8 次应验**
+- #29 (transcript 丢): **4 次应验**
 - #32 (.bak 生命周期): **2 次应验**
 - #33 (Detached HEAD): **2 次应验**
 - #34 (V SOP 必 L1): **5 次应验**
 - #35 (5 仓 ahead 推 origin): **2 次应验**
-- #36 (升级必带 test): 2 次应验 (6/18 沿用)
-- #37 (5 仓 git activity): 1 次应验 (6/18 实装, 6/19 静默期 0 commit)
-- #38 (V 开 PR 流程 + 写权边界): **2 次应验**
+- #36 (升级必带 test): 2 次应验
+- #37 (5 仓 git activity): 1 次应验
+- #38 (V 开 PR 流程 + 写权边界): **3 次应验**
 
 ## Related
 
