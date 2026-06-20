@@ -132,13 +132,13 @@ done
 
 ## 6/20 起 — 记忆 RAG 检索 (自动 + 手动两种)
 
-用法示例 (修真 + 修真 修真):
+用法示例 (▢▢ + ▢▢ ▢▢):
 ```bash
-# 修真 修真 修真 — 修真 MEMORY.md 修真 修真 (SOP 修真 / 修真 修真 修真 / 修真 修真)
+# ▢▢ ▢▢ ▢▢ — ▢▢ MEMORY.md ▢▢ ▢▢ (SOP ▢▢ / ▢▢ ▢▢ ▢▢ / ▢▢ ▢▢)
 python3 /home/fuguang/.openclaw/workspace/tools/v-memory-search.py "SOP" --top 3
 
-# 修真: 修真 修真 修真 — 修真 修真修真 修真 修真
+# ▢▢: ▢▢ ▢▢ ▢▢ — ▢▢ ▢▢▢▢ ▢▢ ▢▢
 python3 /home/fuguang/.openclaw/workspace/tools/v-memory-search.py "RAG" --top 3
 ```
 
-修真: 修真 修真 + 修真 修真 + 修真 修真 (TF-IDF) — 修真 修真 修真 修真, 修真 修真 修真
+▢▢: ▢▢ ▢▢ + ▢▢ ▢▢ + ▢▢ ▢▢ (TF-IDF) — ▢▢ ▢▢ ▢▢ ▢▢, ▢▢ ▢▢ ▢▢
