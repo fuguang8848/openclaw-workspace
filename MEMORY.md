@@ -83,6 +83,46 @@ AdminPanel → 6006 proxy → 6005 handler
 - 7. AdminPanel 200 OK ✓
 - 8. watchdog log 干净启动 ✓
 
+
+
+## VCP 加权健康分 (V 6/20 升级, 加权健康分实装完毕)
+
+三个新端点 (不需认证, 供监控/uptime-kuma 调用):
+- `/health` — 简要信息 (status, score, grade, breakdown)
+- `/health/detailed` — 完整指标 (含 process/dependencies 详情)
+- `/health/history` — 历史时序 (max 100 entries, ?limit=N)
+
+### 评分权重 (六个维度, 满分 100)
+| 维度 | 权重 | 满分条件 |
+|---|---|---|
+| 进程状态 (process) | 25 | 服务在线 |
+| 依赖服务 (dependencies) | 25 | 全部 UP |
+| 堆内存 (heap memory) | 20 | < 800MB |
+| 系统负载 (load avg) | 15 | < 2.0 |
+| 常驻内存 (rss memory) | 10 | < 1GB |
+| 运行时长 (uptime) | 5 | > 60s |
+
+### 等级划分
+- 95-100 分: A 优秀
+- 80-94 分: B 良好
+- 60-79 分: C 警告
+- 40-59 分: D 降级
+- 0-39 分: F 危险
+
+### 备份位置
+实装前已备份 (出问题可回退):
+- `~/VCPToolBox/server.js.bak-pre-health-upgrade-20260620-1510`
+- `~/VCPToolBox/adminServer.js.bak-pre-health-upgrade-20260620-1510`
+
+### 验证结果
+- 调用 VCP 两个端口查看 `/health/detailed` (含 agent_count 来自 agent_map.json)
+- uptime 项刚启动时会丢 5 分 (60s 后会自动拿满)
+- 依赖项里默认检查 `vcp_internal` (自身) + agent_map 文件可读性
+
+实装后实测:
+- 6005 /health: 95/100 等级 A (进程刚启动 14s 时长的丢分)
+- 6006 /health: 95/100 等级 A (进程刚启动 17s 时长的丢分)
+
 ## ✅ AgentSafety CircuitBreaker / PermissionChecker API 完整化 (2026-06-07 06:50)
 
 ### Commit
