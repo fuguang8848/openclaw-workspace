@@ -1,0 +1,3 @@
+[submodule "plugins/v-pre-send-guard"]
+	path = plugins/v-pre-send-guard
+	url = https://github.com/fuguang8848/openclaw-v-pre-send-guard.git

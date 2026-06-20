@@ -59,3 +59,4 @@ backups/
 
 # V archive 目录 (修真 修真修真 修真修真 修真, 不入仓)
 .archive/
+# plugins/
