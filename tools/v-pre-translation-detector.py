@@ -10,7 +10,7 @@ Chinese character).
 
 This detector finds phrases that look like English→placeholder translations:
 - "▢▢ commit" / "commit ▢▢" (English term adjacent to placeholder)
-- "▢▢ 5 仓" / "修真 5 仓" (placeholder + count + measure word, classic pattern)
+- "▢▢ 5 仓" / "▢▢ 5 仓" (placeholder + count + measure word, classic pattern)
 - "▢▢ ▢▢ ▢▢" (placeholder stacking, gibberish pattern)
 - English term in list without Chinese explanation
 
@@ -54,7 +54,7 @@ def detect_translations(text: str) -> list[dict]:
     """Find patterns that suggest English→placeholder translation."""
     issues = []
 
-    # Pattern 1: placeholder + count + measure word (修真 5 仓)
+    # Pattern 1: placeholder + count + measure word (▢▢ 5 仓)
     for m in re.finditer(rf"▢▢\s*\d+\s*{MEASURE_WORDS}", text):
         ctx_start = max(0, m.start() - 10)
         ctx_end = min(len(text), m.end() + 10)
@@ -76,7 +76,7 @@ def detect_translations(text: str) -> list[dict]:
                 "context": text[ctx_start:ctx_end].replace("\n", " "),
             })
 
-    # Pattern 3: placeholder stacking (▢▢ ▢▢ ▢▢ or 修真修真)
+    # Pattern 3: placeholder stacking (▢▢ ▢▢ ▢▢ or ▢▢▢▢)
     for m in re.finditer(r"(▢▢\s*){2,}", text):
         ctx_start = max(0, m.start() - 5)
         ctx_end = min(len(text), m.end() + 5)
