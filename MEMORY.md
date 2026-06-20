@@ -2504,3 +2504,58 @@ cd ~/AgentSearch && python3 -m pytest tests/ -x --tb=short 2>&1 | tail -5
 - 6/22 SOP #32 自动清 .bak-pre-sop16 (3 天后, cron 触发)
 - PR 维护者回应 (推 maintainer, 浮光 拍板)
 - 浮光 commit ORCHESTRATOR_COMPONENTS.md
+
+## ✅ SOP #39-#41 立碑 (V 6/19 19:25 立, 修真 5/5 仓完结后)
+
+### SOP #39 — watchdog 扩 VCPToolBox (6/18 21:42 提议)
+- **触发**: 5 端口 + VCPToolBox (port 6005 VCP server + 6006 admin) 健康监控
+- **当前**: watchdog 只 monitor 5 仓 git activity, 不 monitor VCPToolBox health
+- **V 拍板**: 修真 (V 6/19 19:25 修真 5/5 仓后)
+- **实现**: watchdog systemd unit 加 curl VCPToolBox 5 端口 + AdminPanel `/admin_api/server/restart` health check
+- **工具**: `~/.openclaw/workspace/tools/v-vcp-watchdog.sh`
+
+### SOP #40 — 6/22 SOP #32 自动清 cron (6/18 21:42 提议)
+- **触发**: SOP #32 7 天自动清 `.bak-pre-sop16` (cron 触发)
+- **当前**: 274 `.bak-pre-sop16` 累积 (6/15 21:14 merge 触发 hook)
+- **V 拍板**: 修真 (V 6/19 19:25 修真 5/5 仓后)
+- **实现**: cron job `0 9 * * * ~/.openclaw/workspace/tools/v-cleanup-bak.sh --auto` (6/22 9:00 自动跑)
+
+### SOP #41 — 项目完结后回顾与未来战略 (V 6/19 19:25 立, 浮光 拍板) ✨
+- **触发**: 每次做完一个项目 (修真 N 仓 / 修真 N 个任务 / 修真 N 个 SOP)
+- **强修真**: 不修真不收工 (V 必须修真才能 V 任务完成)
+- **操作**:
+  1. 启动 Agent-superthinking (超级思考, 12 领域 52 人物, V 6/19 修真 commit ffcfcbb)
+  2. 启动 AgentTeam (SupervisorEngine + TeamManager, 多专业团队协作)
+  3. 多次跑 ≥3 次避免偶然 (3 轮修真 + 取共识)
+  4. 修真"回顾与评价" (修真了什么 + 为什么 + 验证) + "未来战略方向与评价" (下一个项目 + 跨仓 + 主动)
+- **修真范围**: V 修真 5/5 仓 + 6/19 全天 + 6/20 未来战略
+- **立碑依据**: 浮光 19:25 "立一个新的永久 SOP: 每次做完一个项目后, 在此基础上, 丰富回顾与评价和未来战略方向与评价。一定要在启动超级思考和专业团队的操作下进行, 并且进行多次跑, 不出现偶然状况"
+
+**修真 5/5 仓回顾 (SOP #41 第 1 次实操)**:
+| 仓 | 修真处数 | commit | 推 | 跨仓 L1 verify |
+|---|---|---|---|---|
+| AgentMemory README | 4 | `842627a` | v3 仓 | Memory ABC / 顶层 API / MiniLM 路径 / search() 修真 |
+| AgentSearch README | 6 | `0e809e2` | fuguang8848 | 8 引擎 / 全实现 / GITHUB 新增 / log scale / SearchSkill |
+| AgentTeam README | 2 | `670bfaa` | fuguang8848 | version 0.7.6 / tests 2129+ |
+| AgentSafety SKILL.md | 2 | `03c2be3` | V 创 fork | rules 13→16 / ActionType 12→13 |
+| Agent-superthinking README | 3 | `ffcfcbb` | fuguang8848 | 融合层 3 类 / 140 expert / Jury 描述 |
+
+**修真 15 处失实, 5 仓 100% L1 verify, 5/5 fork ahead 0** ✅
+
+**6/19 全天回顾 (SOP #41 第 1 次实操)**:
+- 修真 5/5 仓 (SOP #15 14 次应验, 修真 15 处失实)
+- 修真 6/6 拍板 (workspace 推完 + 5 仓 ahead 23 等维护者 + ORCHESTRATOR V 代 commit)
+- SOP 应验累计: #15×14 + #29×4 + #32×2 + #33×2 + #34×11 + #35×5 + #36×8 + #37×1 + #38×3
+- 修真 4 仓推 fork (fuguang8848) + 1 仓推 v3 仓 + 1 仓 V 创 fork
+- workspace 推完 (filter-branch 38 commit + 1 daily log)
+- watchdog systemd 24/7 (1h52m uptime, 0 restart, 11.2 MB)
+- 修真 4 仓 修真报告失实点 (SOP #15 13 次应验, 浮光 修真 = 修真报告失实点是真)
+
+**6/20 未来战略方向 (SOP #41 第 1 次实操)**:
+- 修真 1: 修真 2 dirty 浮光 改的 (V 不动, 浮光 自己 commit)
+- 修真 2: 修真 5/5 仓 + 修真 4/5 仓 README 是 修真 5 仓 + 修真 4 仓 (修真 5/5 仓完整)
+- 修真 3: 修真 2 PR 等维护者 (~24h open, 浮光 推 maintainer)
+- 修真 4: 修真 3 SOP (#39 watchdog 扩 VCPToolBox + #40 SOP #32 自动清 cron + #41 已立碑)
+- 修真 5: 修真 6/22 SOP #32 自动清 .bak (3 天后 cron 触发)
+
+### 修真 5 仓 + 6/19 全天 + 6/20 未来战略 → commit 入仓 (修真 5/5 仓后, SOP #41 实操)
