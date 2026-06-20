@@ -92,3 +92,28 @@ done
 ## Related
 
 - [Heartbeat config](/gateway/config-agents)
+
+---
+
+## ⏸️ PR 推送暂停 (浮光 6/20 09:31 拍板)
+
+**规则**: 所有 PR 先保存 (不 push), 等浮光说"所有 PR 一起上传"再推送。
+
+**当前状态**:
+- AgentSearch #2 (OPEN, 44h+, mergeable=CLEAN)
+- Agent-superthinking #5 (OPEN, 44h+, mergeable=CLEAN)
+
+**V 不做** (等浮光信号):
+- ❌ force-push 任何 PR
+- ❌ 给 PR 加 comment
+- ❌ rebase
+- ❌ close / reopen
+- ❌ 修改 PR 包含的代码 (跟 PR 关联的本地 commit)
+
+**V 可以做** (跟 PR 无关的):
+- ✅ L1 修真 (端口 / watchdog / 5 仓状态)
+- ✅ 修真 workspace (HEARTBEAT.md / MEMORY.md / tools/)
+- ✅ 修真 其他 3 仓 (AgentTeam / AgentMemory-upgrade / AgentSafety)
+- ✅ 修真 PR 修真 修真 (本地仓库, 修真 push)
+
+**触发解锁**: 浮光 说"所有 PR 一起上传" 或 "上传 PR #2/#5" 修真 → V 修真 push.
