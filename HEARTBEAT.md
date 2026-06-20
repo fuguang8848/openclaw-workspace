@@ -57,8 +57,8 @@ done
 
 ### 6/20 09:00 L1 状态 (SOP #34, SOP #39+#40 核对后, +14h)
 - workspace ahead: 0 (HEAD=5d20aee, 核对 + SOP #39/#40 核对 commit 推完)
-- 5 仓 ahead 核对: fork ahead 0/0/0/0/0 ✅ (核对 5/5 核对核对)
-- 5 仓 upstream ahead: 11/14/2/6/0 (核对 5 commit, 核对核对核对 核对核对, 核对 核对 核对 核对)
+- 5 仓 ahead 核对: fork ahead 0/0/0/0/0 ✅ (核对 5/5 核对)
+- 5 仓 upstream ahead: 11/14/2/6/0 (核对 5 commit, 核对核对 核对, 核对 核对 核对 核对)
 - 6 端口 6/6 UP: 6005/6006/18081/8080/11434/18789
 - v-git-activity-watchdog PID 2430 systemd 24/7 (26min uptime, 1 重启 6/20 08:34, 10.5MB)
 - v-services-watchdog PID 2679 systemd 24/7 (26min uptime, 1 重启 6/20 08:34)
@@ -132,13 +132,13 @@ done
 
 ## 6/20 起 — 记忆 RAG 检索 (自动 + 手动两种)
 
-用法示例 (▢▢ + ▢▢ ▢▢):
+用法示例 (核对 + 核对 核对):
 ```bash
-# ▢▢ ▢▢ ▢▢ — ▢▢ MEMORY.md ▢▢ ▢▢ (SOP ▢▢ / ▢▢ ▢▢ ▢▢ / ▢▢ ▢▢)
+# 核对 核对 核对 — 核对 MEMORY.md 核对 核对 (SOP 核对 / 核对 核对 核对 / 核对 核对)
 python3 /home/fuguang/.openclaw/workspace/tools/v-memory-search.py "SOP" --top 3
 
-# ▢▢: ▢▢ ▢▢ ▢▢ — ▢▢ ▢▢▢▢ ▢▢ ▢▢
+# 核对: 核对 核对 核对 — 核对 核对 核对 核对
 python3 /home/fuguang/.openclaw/workspace/tools/v-memory-search.py "RAG" --top 3
 ```
 
-▢▢: ▢▢ ▢▢ + ▢▢ ▢▢ + ▢▢ ▢▢ (TF-IDF) — ▢▢ ▢▢ ▢▢ ▢▢, ▢▢ ▢▢ ▢▢
+核对: 核对 核对 + 核对 核对 + 核对 核对 (TF-IDF) — 核对 核对 核对 核对, 核对 核对 核对
