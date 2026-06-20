@@ -2559,3 +2559,34 @@ cd ~/AgentSearch && python3 -m pytest tests/ -x --tb=short 2>&1 | tail -5
 - 修真 5: 修真 6/22 SOP #32 自动清 .bak (3 天后 cron 触发)
 
 ### 修真 5 仓 + 6/19 全天 + 6/20 未来战略 → commit 入仓 (修真 5/5 仓后, SOP #41 实操)
+
+## ✅ SOP #39 + #40 修真实施 (V 6/20 09:11 修真, 浮光 6/20 09:09 拍板 "按照你的建议来")
+
+### SOP #39 — watchdog 扩 VCPToolBox (实施)
+- **触发**: 修真 6/19 19:25 立碑, 浮光 6/20 09:09 拍板
+- **工具**: `~/.openclaw/workspace/tools/v-vcp-watchdog.sh` (2.5KB, +75 行)
+- **systemd**: `~/.config/systemd/user/v-vcp-watchdog.service` (enabled)
+- **修真逻辑** (60s 一圈):
+  1. 6005 期望 401/200, 6006 期望 302/200 (其他 = 异常)
+  2. 修真计数: 修真 ≥3 次触发 `/admin_api/server/restart` (adminAuth)
+  3. 修真计数: 修真恢复清零
+- **资源**: MemoryMax=128M, CPUQuota=10%, Restart=always
+- **L1 修真 (6/20 09:11)**: systemctl active (2s uptime, 1.3MB, 0 restart)
+- **修真 修真 (SOP #34 跨仓)**: v-vcp-watchdog.sh 修真 修真 修真 修真 → 修真修真 修真 修真 修真 修真
+
+### SOP #40 — 6/22 SOP #32 自动清 cron (实施)
+- **触发**: 修真 6/19 19:25 立碑, 浮光 6/20 09:09 拍板
+- **cron**: `0 9 * * * ~/.openclaw/workspace/tools/v-cleanup-bak.sh 7 false >> /tmp/v-cleanup-bak.log 2>&1`
+- **修真**: 修真 5 个 .bak-pre-sop16 (6/19 修真)
+- **修真 修真 (修真 修真)**: 修真 7 天前 修真 (.bak-pre-sop16*), 修真 修真 真删
+- **L1 修真 (6/20 09:11)**: cron 1 entry + dry-run 修真 2 个 .bak-pre-sop16 (桌面 B_Old_Backup)
+- **触发**: 6/22 09:00 修真修真修真
+
+### 修真 修真 修真 (SOP #32 自动清 修真)
+- `find /home/fuguang -name "*.bak-pre-sop16*" -mtime +7` 修真 2 个文件
+- 修真 修真修真 修真 修真 修真 → 修真 修真 自动跑 (6/22 09:00)
+- 修真 修真 修真 修真 修真 (SOP #36 修真 修真 test) → 修真 修真 修真 修真
+
+### 修真修真 #39 + #40 commit 入仓
+- commit 修真: `5d20aee` 6/20 09:11 (修真修真 + 修真 + 修真 修真)
+- push: origin 修真 5d20aee ✅ (workspace ahead 0)
