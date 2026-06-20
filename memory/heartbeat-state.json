@@ -21,6 +21,6 @@
     "2026-06-05_morning_cron": "memory review 触发, 模板 '晚上了' 误为 morning 10:47, 已记录。服务 4/5 挂过夜, 浮光回来一并拉起。",
     "2026-06-06_evening_cron": "周六 23:00 静默心跳。浮光无活动。MEMORY.md 已 108KB (6/3 SOP 阈值 50K × 2.16)。6/5 22:25 anchor 仍有效, 7 拍板项等浮光。",
     "2026-06-07_morning_cron": "周日 09:00 通用模板早安, 内部处理未 push。6/7 06:50-08:55 浮光 5 任务已落 (16KB 日志 + 桌面报告 16055B), 8 拍板项 + 11 SOP 升级待浮光。",
-  "2026-06-20_morning_cron": "周六 09:00 SOP #28 daily check。修真 5/5 仓 +14h, 修真后 5 仓 fork ahead 0, upstream ahead 33, 2 dirty 浮光 新改 (AgentTeam/utils.py + AgentSafety/skill.py), watchdog PID 2430+2679 systemd 24/7 健康。gh CLI 缺失 (查不到 2 PR 状态, 浮光 拍板重装)。"
+  "2026-06-20_morning_cron": "周六 09:00 SOP #28 daily check。▢▢ 5/5 仓 +14h, ▢▢后 5 仓 fork ahead 0, upstream ahead 33, 2 dirty 浮光 新改 (AgentTeam/utils.py + AgentSafety/skill.py), watchdog PID 2430+2679 systemd 24/7 健康。gh CLI 缺失 (查不到 2 PR 状态, 浮光 拍板重装)。"
   }
 }
