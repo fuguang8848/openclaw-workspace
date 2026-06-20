@@ -2590,3 +2590,32 @@ cd ~/AgentSearch && python3 -m pytest tests/ -x --tb=short 2>&1 | tail -5
 ### 修真修真 #39 + #40 commit 入仓
 - commit 修真: `5d20aee` 6/20 09:11 (修真修真 + 修真 + 修真 修真)
 - push: origin 修真 5d20aee ✅ (workspace ahead 0)
+
+## ✅ gh CLI 修真 (V 6/20 09:14, 修真 修真 #3 修真)
+
+### 修真
+- apt gh 修真 (rocm-smi-lib 修真, --fix-broken 修真 修真)
+- 修真: github.com/cli/cli v2.65.0 binary → `~/.local/bin/gh` (13MB tar.gz)
+- 修真: `~/.bashrc` 加 `export PATH=...` + `export GH_TOKEN=...` (修真 修真 修真)
+
+### L1 修真 (6/20 09:14)
+- `gh --version` = v2.65.0 ✅
+- `gh pr list --repo YintaTriss/AgentSearch` = PR #2 OPEN 修真 44h+ ✅
+- `gh pr list --repo YintaTriss/Agent-superthinking` = PR #5 OPEN 修真 44h+ ✅
+- `gh pr list --repo YintaTriss/AgentTeam` = 修真 (修真 修真) ✅
+
+### PR 修真 (修真 GH_TOKEN, 修真 修真)
+| PR | 修真 | 修真 | 修真 | 修真 |
+|---|---|---|---|---|
+| AgentSearch #2 | OPEN | 6/18 13:18 | ~44h | 修真 3 修真 修真 (6/21 09:00) |
+| Agent-superthinking #5 | OPEN | 6/18 13:23 | ~44h | 修真 3 修真 修真 (6/21 09:00) |
+| AgentTeam | 修真 | - | - | 修真 修真 (fuguang8848 直接 fork) |
+
+### 修真 修真 (SOP #38 #6)
+- PR 等 maintainer, V 修真 (V 修真 merge, 修真 maintainer)
+- 修真 3 修真 (修真 72h), SOP #38 #6 + HEARTBEAT.md 修真 修真
+- 浮光 修真: 推 maintainer / 修真 PR / 修真 修真 修真
+
+### 修真 commit
+- 修真: MEMORY.md (本节) + 修真 commit
+- 修真: `87e41a4` (SOP #39/#40 修真) + `gh CLI 修真` 修真 commit
